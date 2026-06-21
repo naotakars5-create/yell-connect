@@ -1,0 +1,13 @@
+# Render Blueprint — エールコネクト 静的HTMLモック（ビルド不要）
+# ルート直下の index.html をそのまま配信する静的サイト。
+services:
+  - type: web
+    name: yell-connect
+    runtime: static
+    buildCommand: "echo no build step needed"
+    staticPublishPath: .
+    # 単一ページ（URLルーティング無し）のため rewrite ルールは不要
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache
