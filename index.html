@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#f97316" />
+<title>エールコネクト | 部活動支援プラットフォーム</title>
+<style>
+  :root{
+    --yell50:#fff7ed; --yell100:#ffedd5; --yell200:#fed7aa; --yell300:#fdba74;
+    --yell400:#fb923c; --yell500:#f97316; --yell600:#ea580c; --yell700:#c2410c;
+    --ember100:#fee2e2; --ember400:#f87171; --ember500:#ef4444; --ember600:#dc2626;
+    --warmbg:#faf6f2; --card:#ffffff; --border:#f0e6dd;
+    --ink:#1f2937; --ink2:#4b5563; --mut:#9ca3af; --mut2:#d1d5db;
+    --emerald100:#d1fae5; --emerald500:#10b981; --emerald600:#059669; --emerald700:#047857;
+    --violet100:#ede9fe; --violet600:#7c3aed; --violet700:#6d28d9;
+    --grad:linear-gradient(135deg,#f97316 0%,#ef4444 100%);
+    --gradsoft:linear-gradient(135deg,#ffedd5 0%,#fee2e2 100%);
+    --shadow:0 2px 12px rgba(234,88,12,.07);
+    --shadow2:0 8px 30px rgba(0,0,0,.18);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:ui-sans-serif,system-ui,"Hiragino Kaku Gothic ProN","Hiragino Sans","Meiryo",sans-serif;
+    background:#e7ded6;
+    color:var(--ink);
+    background-image:radial-gradient(circle at 20% 10%,#f4ece4 0,transparent 45%),radial-gradient(circle at 90% 90%,#efe5db 0,transparent 40%);
+    min-height:100vh;
+    display:flex; justify-content:center;
+    -webkit-font-smoothing:antialiased;
+  }
+  .frame{
+    position:relative; display:flex; flex-direction:column;
+    width:100%; max-width:430px; min-height:100vh; background:var(--warmbg);
+    overflow:hidden;
+  }
+  @media (min-width:480px){
+    body{padding:24px 0;}
+    .frame{min-height:calc(100vh - 48px); max-height:920px; border-radius:32px;
+      box-shadow:var(--shadow2); border:1px solid var(--border);}
+  }
+  .topbar{
+    position:sticky; top:0; z-index:30; height:56px;
+    display:flex; align-items:center; justify-content:space-between; padding:0 16px;
+    background:rgba(255,255,255,.9); backdrop-filter:blur(8px); border-bottom:1px solid var(--border);
+  }
+  .logo{display:flex;align-items:center;gap:6px;cursor:pointer;}
+  .logo .lg{font-size:20px;}
+  .logo b{font-weight:800;font-size:15px;letter-spacing:-.01em;}
+  .logo .o{color:var(--yell600);} .logo .r{color:var(--ember600);}
+  .top-right{display:flex;align-items:center;gap:8px;}
+  .switch{display:flex;background:var(--warmbg);border:1px solid var(--border);border-radius:999px;padding:2px;}
+  .switch button{border:0;background:transparent;font-size:11px;font-weight:700;padding:5px 9px;border-radius:999px;color:var(--mut);cursor:pointer;}
+  .switch button.on-active{background:var(--emerald500);color:#fff;}
+  .switch button.on-ob{background:var(--grad);color:#fff;}
+  .bell{position:relative;width:36px;height:36px;border-radius:999px;display:grid;place-items:center;border:0;background:transparent;cursor:pointer;font-size:18px;}
+  .bell:hover{background:var(--warmbg);}
+  .badge-dot{position:absolute;top:5px;right:5px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:var(--ember500);color:#fff;font-size:9px;font-weight:800;display:grid;place-items:center;}
+  .main{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:16px;}
+  .main::-webkit-scrollbar{display:none;} .main{scrollbar-width:none;}
+  .bottomnav{position:sticky;bottom:0;z-index:30;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-top:1px solid var(--border);display:flex;}
+  .bottomnav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;color:var(--mut);cursor:pointer;text-decoration:none;}
+  .bottomnav a.on{color:var(--ember600);}
+  .bottomnav .ic{font-size:20px;line-height:1;}
+  .bottomnav .lb{font-size:10px;font-weight:600;}
+
+  .page{padding:16px;}
+  .stack{display:flex;flex-direction:column;}
+  .gap3>*+*{margin-top:12px;} .gap4>*+*{margin-top:16px;} .gap5>*+*{margin-top:20px;} .gap2>*+*{margin-top:8px;}
+  .row{display:flex;align-items:center;} .between{justify-content:space-between;}
+  .h1{font-size:18px;font-weight:800;margin:0;}
+  .card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:14px;}
+  .muted{color:var(--mut);} .small{font-size:11px;} .xs{font-size:10px;}
+  .sec-title{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:800;margin:0 0 12px;}
+  .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .link{color:var(--yell600);font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:2px;text-decoration:none;}
+  .btn{border:0;cursor:pointer;font-weight:800;border-radius:999px;font-family:inherit;}
+  .btn-grad{background:var(--grad);color:#fff;box-shadow:var(--shadow);}
+  .btn-block{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:12px;font-size:14px;}
+  .btn:active{transform:scale(.96);}
+  .btn[disabled]{opacity:1;background:#f3f4f6;color:#9ca3af;cursor:default;box-shadow:none;}
+  .pill{border:0;background:var(--warmbg);color:var(--mut);font-weight:700;border-radius:999px;cursor:pointer;font-family:inherit;}
+  .iconbtn{width:32px;height:32px;border-radius:999px;display:grid;place-items:center;border:0;background:transparent;cursor:pointer;font-size:16px;}
+  .iconbtn:hover{background:#fff;}
+  .grad{background:var(--grad);color:#fff;}
+  .gradsoft{background:var(--gradsoft);}
+  .avatar{flex:none;border-radius:999px;background:var(--warmbg);border:1px solid var(--border);display:grid;place-items:center;user-select:none;}
+  .av-sm{width:32px;height:32px;font-size:15px;} .av-md{width:40px;height:40px;font-size:20px;} .av-lg{width:56px;height:56px;font-size:26px;}
+  .ring-ob{box-shadow:0 0 0 2px var(--yell300);} .ring-active{box-shadow:0 0 0 2px #6ee7b7;}
+  .rbadge{font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;}
+  .rbadge.ob{background:var(--yell100);color:var(--yell700);}
+  .rbadge.active{background:var(--emerald100);color:var(--emerald700);}
+  .chip{font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:3px;}
+  .progress{height:8px;width:100%;border-radius:999px;background:var(--warmbg);overflow:hidden;}
+  .progress>i{display:block;height:100%;border-radius:999px;background:var(--grad);transition:width .5s;}
+  .progress.ondark{background:rgba(255,255,255,.25);}
+  .progress.ondark>i{background:#fff;}
+  .media{border-radius:14px;position:relative;display:grid;place-items:center;color:#fff;overflow:hidden;}
+  .media .em{font-size:40px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2));}
+  .media .ph{position:absolute;bottom:6px;right:8px;font-size:9px;font-weight:800;letter-spacing:.08em;color:rgba(255,255,255,.85);}
+
+  .hero{border-radius:16px;padding:16px;color:#fff;box-shadow:var(--shadow);}
+  .hero-stat{flex:1;text-align:center;}
+  .hero-stat b{font-size:16px;font-weight:800;display:block;} .hero-stat span{font-size:10px;opacity:.85;}
+
+  .ql{flex:1;background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:12px;display:flex;flex-direction:column;gap:4px;cursor:pointer;text-decoration:none;color:inherit;}
+  .ql:active{transform:scale(.96);}
+  .ql .ic{font-size:20px;} .ql .lb{font-size:13px;font-weight:800;} .ql .sub{font-size:10px;color:var(--mut);}
+
+  textarea,input[type=text],input[type=number]{font-family:inherit;width:100%;border:1px solid var(--border);border-radius:12px;padding:10px;font-size:13px;background:var(--warmbg);resize:none;outline:none;}
+  textarea:focus,input:focus{border-color:var(--yell300);background:#fff;}
+  .cat-pill,.emoji-pill{font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--warmbg);color:var(--ink2);cursor:pointer;font-family:inherit;}
+  .cat-pill.sel{background:var(--grad);color:#fff;border-color:transparent;}
+  .emoji-pill{font-size:18px;padding:4px 8px;}
+  .emoji-pill.sel{background:var(--yell100);border-color:var(--yell300);}
+
+  .note{display:flex;gap:8px;align-items:flex-start;border-radius:12px;background:var(--yell50);border:1px solid var(--yell100);padding:12px;font-size:11px;color:var(--yell700);line-height:1.6;}
+
+  .overlay{position:absolute;inset:0;z-index:50;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;animation:fade .2s ease;}
+  .sheet{width:100%;max-width:430px;background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 28px;text-align:center;animation:slideup .28s ease;}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @keyframes slideup{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes pop{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+  .check{width:64px;height:64px;border-radius:999px;background:var(--emerald500);color:#fff;font-size:32px;display:grid;place-items:center;margin:0 auto 14px;animation:pop .35s ease;}
+  .truncate{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .grow{flex:1;min-width:0;}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div id="topbar"></div>
+  <main class="main" id="main"></main>
+  <nav class="bottomnav" id="bottomnav"></nav>
+  <div id="modal-root"></div>
+</div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   エールコネクト — Node不要 単一HTMLモック（オフライン動作）
+   ============================================================ */
+
+/* ---------- ダミーデータ ---------- */
+const club = {
+  schoolName:"千葉東高等学校", clubName:"ラグビーフットボール部", emblem:"🏉",
+  established:"1965年", memberCount:28, obCount:412,
+  catchphrase:"One for All, All for One.",
+};
+const users = {
+  active:{ id:"active-self", name:"佐藤 蓮", role:"active", avatar:"🧑‍🎓",
+    grade:"2年 / SO", position:"スタンドオフ・副キャプテン",
+    bio:"県ベスト8を全員で超える。応援、いつもありがとうございます！" },
+  ob:{ id:"ob-self", name:"山路 直卓", role:"ob", avatar:"🧑‍💼",
+    graduationYear:2008, position:"第43期 / 元主将",
+    bio:"千葉市在住。後輩たちの挑戦を本気で応援しています。" },
+};
+const seedPosts = [
+  { id:"post-1", authorName:"佐藤 蓮", authorAvatar:"🧑‍🎓", authorRole:"active",
+    createdAt:"2026-06-20T18:30:00+09:00", category:"試合結果",
+    body:"県予選2回戦、市立船橋に 24-19 で勝利しました！🔥 後半ロスタイムのトライで逆転。最後まで諦めない全員ラグビーができました。応援してくださった皆さん、本当にありがとうございました！",
+    imageEmoji:"🏉", imageBg:"emerald", likeCount:86,
+    comments:[
+      { id:"c1", authorName:"山路 直卓", authorAvatar:"🧑‍💼", authorRole:"ob", body:"おめでとう！ロスタイムの粘り、OB一同泣きました。次も応援してるぞ！", createdAt:"2026-06-20T19:05:00+09:00" },
+      { id:"c2", authorName:"田中 美咲", authorAvatar:"👩‍💼", authorRole:"ob", body:"感動しました！差し入れ送りますね🍙", createdAt:"2026-06-20T20:11:00+09:00" },
+    ] },
+  { id:"post-2", authorName:"顧問 / 鈴木先生", authorAvatar:"👨‍🏫", authorRole:"active",
+    createdAt:"2026-06-18T17:00:00+09:00", category:"練習",
+    body:"今週は接点の強化週間。タックルバッグを使った反復練習で当たりの精度が上がってきました。消耗が激しく、バッグの中身が破れ始めているのが悩みどころです…💦",
+    imageEmoji:"💪", imageBg:"yell", likeCount:41,
+    comments:[
+      { id:"c3", authorName:"高橋 健一", authorAvatar:"🧑‍🔧", authorRole:"ob", body:"タックルバッグ、欲しい物リストに上げてくれれば支援します！", createdAt:"2026-06-18T18:20:00+09:00" },
+    ] },
+  { id:"post-3", authorName:"渡辺 翔", authorAvatar:"🧑", authorRole:"active",
+    createdAt:"2026-06-15T12:10:00+09:00", category:"活動報告",
+    body:"OBの皆さんから頂いた新しいラグビーボール、早速使わせてもらっています！グリップが全然違って、パスもキックも安定します。大切に使います！🙏",
+    imageEmoji:"🏉", imageBg:"orange", likeCount:58, comments:[] },
+  { id:"post-4", authorName:"伊藤 大和", authorAvatar:"🧑‍🦱", authorRole:"active",
+    createdAt:"2026-06-12T19:45:00+09:00", category:"練習",
+    body:"梅雨の合間の貴重な晴れ。グラウンドでセットプレーの確認をしました。スクラムの組み方を一から見直し中です。次の試合までに完成させます！",
+    imageEmoji:"🌤️", imageBg:"sky", likeCount:33,
+    comments:[
+      { id:"c4", authorName:"中村 誠", authorAvatar:"👨‍🦳", authorRole:"ob", body:"スクラムは我々の代の生命線だった。頑張れ！", createdAt:"2026-06-12T21:00:00+09:00" },
+    ] },
+];
+const seedWishlist = [
+  { id:"wish-1", name:"ラグビーボール（試合球）", emoji:"🏉", bg:"orange", price:6800, needed:10, funded:6, priority:"高", reason:"試合球が摩耗し、公式戦で使えるボールが不足しています。" },
+  { id:"wish-2", name:"タックルバッグ", emoji:"🛡️", bg:"yell", price:12000, needed:4, funded:1, priority:"高", reason:"接点強化の要。中身が破れ、買い替えが必要です。" },
+  { id:"wish-3", name:"プロテイン（部全体用）", emoji:"🥤", bg:"pink", price:4500, needed:12, funded:8, priority:"中", reason:"体づくりのため。消耗品なので継続的に必要です。" },
+  { id:"wish-4", name:"練習用ユニフォーム", emoji:"👕", bg:"sky", price:5200, needed:28, funded:12, priority:"中", reason:"新入部員ぶんが不足。揃いのウェアでチーム力を高めたい。" },
+  { id:"wish-5", name:"アイシング用クーラーボックス", emoji:"🧊", bg:"cyan", price:8900, needed:2, funded:0, priority:"低", reason:"夏場の熱中症・怪我対策に必要です。" },
+  { id:"wish-6", name:"キッキングティー", emoji:"🎯", bg:"violet", price:3200, needed:6, funded:6, priority:"低", reason:"プレースキック練習用。おかげさまで充足しました！" },
+];
+const seedSchedule = [
+  { id:"sch-1", date:"2026-06-28T13:00:00+09:00", type:"試合", title:"県予選 3回戦 vs 流通経済大柏", place:"千葉県総合スポーツセンター", watchers:18 },
+  { id:"sch-2", date:"2026-06-24T16:00:00+09:00", type:"練習", title:"セットプレー強化練習", place:"本校グラウンド", watchers:2 },
+  { id:"sch-3", date:"2026-07-12T10:00:00+09:00", type:"大会", title:"関東高校ラグビー大会 千葉県予選 準々決勝", place:"柏の葉公園総合競技場", watchers:41 },
+  { id:"sch-4", date:"2026-06-20T13:00:00+09:00", type:"試合", title:"県予選 2回戦 vs 市立船橋", place:"千葉県総合スポーツセンター", watchers:26, result:{ score:"24 - 19", outcome:"勝", note:"ロスタイム逆転トライ！" } },
+  { id:"sch-5", date:"2026-06-07T13:00:00+09:00", type:"試合", title:"県予選 1回戦 vs 千葉北", place:"本校グラウンド", watchers:15, result:{ score:"38 - 7", outcome:"勝" } },
+  { id:"sch-6", date:"2026-05-18T11:00:00+09:00", type:"試合", title:"練習試合 vs 県立柏", place:"県立柏高校グラウンド", watchers:8, result:{ score:"12 - 22", outcome:"負", note:"課題の見つかる一戦に。" } },
+];
+const seedDonations = [
+  { id:"don-1", date:"2026-06-20T19:10:00+09:00", type:"金額支援", label:"金額支援（試合勝利お祝い）", emoji:"💴", amount:5000 },
+  { id:"don-2", date:"2026-06-10T12:30:00+09:00", type:"物品支援", label:"ラグビーボール（試合球）", emoji:"🏉", amount:6800 },
+  { id:"don-3", date:"2026-05-22T20:00:00+09:00", type:"物品支援", label:"プロテイン（部全体用）", emoji:"🥤", amount:4500 },
+  { id:"don-4", date:"2026-04-15T09:45:00+09:00", type:"金額支援", label:"金額支援（新年度応援）", emoji:"💴", amount:3000 },
+  { id:"don-5", date:"2026-03-03T18:20:00+09:00", type:"物品支援", label:"キッキングティー", emoji:"🎯", amount:3200 },
+  { id:"don-6", date:"2025-12-25T10:00:00+09:00", type:"金額支援", label:"金額支援（冬季合宿サポート）", emoji:"💴", amount:10000 },
+];
+const alumniGroups = [
+  { graduationYear:2008, label:"第43期（2008年卒）", memberCount:24, members:["山路 直卓","斎藤 浩","小林 大輔","加藤 拓也"], recentTopic:"同期会、今年こそやりましょう！", accentEmoji:"🎓" },
+  { graduationYear:2012, label:"第47期（2012年卒）", memberCount:31, members:["田中 美咲","松本 隆","井上 さやか"], recentTopic:"白浜合宿の思い出スレが盛り上がり中", accentEmoji:"🏖️" },
+  { graduationYear:1998, label:"第33期（1998年卒）", memberCount:19, members:["高橋 健一","森 健二","清水 学"], recentTopic:"後輩への物品支援を呼びかけ中", accentEmoji:"🛡️" },
+  { graduationYear:1985, label:"第20期（1985年卒）", memberCount:14, members:["中村 誠","石川 茂","前田 勇"], recentTopic:"OB戦の開催を検討しています", accentEmoji:"🏉" },
+  { graduationYear:2020, label:"第55期（2020年卒）", memberCount:27, members:["山田 蒼","中島 健","藤田 凛"], recentTopic:"若手OBの飲み会、幹事募集！", accentEmoji:"🍻" },
+];
+const boardPosts = [
+  { id:"bbs-1", board:"大会情報", authorName:"山路 直卓", authorAvatar:"🧑‍💼", graduationYear:2008, title:"6/28 県予選3回戦、現地観戦しませんか？", body:"総合スポーツセンターで13時キックオフです。OB席をまとめて確保しようと思います。現地で一緒に応援できる方、コメントください！", createdAt:"2026-06-21T09:00:00+09:00", replyCount:12 },
+  { id:"bbs-2", board:"活動報告", authorName:"高橋 健一", authorAvatar:"🧑‍🔧", graduationYear:1998, title:"タックルバッグ、3つ支援しました", body:"投稿で破れていると見たので、欲しい物リストから支援しました。後輩たちの怪我なく頑張ってほしいですね。", createdAt:"2026-06-19T21:30:00+09:00", replyCount:5 },
+  { id:"bbs-3", board:"雑談", authorName:"田中 美咲", authorAvatar:"👩‍💼", graduationYear:2012, title:"当時の合宿、白浜だった人いますか？", body:"懐かしくて投稿しちゃいました。今の現役生も夏合宿あるのかな?あの坂道ダッシュ、今でも夢に出ます…笑", createdAt:"2026-06-17T12:15:00+09:00", replyCount:23 },
+  { id:"bbs-4", board:"大会情報", authorName:"中村 誠", authorAvatar:"👨‍🦳", graduationYear:1985, title:"関東大会予選の組み合わせが出ましたね", body:"準々決勝で当たる相手、なかなか手強そうです。スクラムで圧倒できるかが鍵になりそう。OB戦で胸を貸す機会も作りたいですね。", createdAt:"2026-06-16T08:40:00+09:00", replyCount:8 },
+  { id:"bbs-5", board:"雑談", authorName:"佐藤 蓮（現役）", authorAvatar:"🧑‍🎓", title:"【現役より】いつも応援ありがとうございます！", body:"OBの皆さんの支援とコメント、部室で読んで本当に励みになっています。3回戦、絶対勝ちます!", createdAt:"2026-06-15T22:00:00+09:00", replyCount:17 },
+];
+const seedEvents = [
+  { id:"ev-1", title:"県予選3回戦 OB合同観戦会", kind:"観戦会", date:"2026-06-28T12:30:00+09:00", place:"千葉県総合スポーツセンター OB席", capacity:50, participants:32, joined:false, hostName:"山路 直卓（第43期）", emoji:"📣" },
+  { id:"ev-2", title:"創部60周年記念 OB戦 & 懇親会", kind:"OB戦", date:"2026-09-23T10:00:00+09:00", place:"本校グラウンド → 千葉駅前で懇親会", capacity:80, participants:54, joined:true, hostName:"中村 誠（第20期）", emoji:"🏉" },
+  { id:"ev-3", title:"若手OB 交流飲み会", kind:"懇親会", date:"2026-07-05T19:00:00+09:00", place:"千葉中央 個室居酒屋", capacity:20, participants:14, joined:false, hostName:"山田 蒼（第55期）", emoji:"🍻" },
+];
+const notices = [
+  { id:"no-1", icon:"support", title:"支援が届きました", body:"高橋 健一さんがタックルバッグを3つ支援しました。ありがとうございます！", createdAt:"2026-06-21T08:30:00+09:00", unread:true, audience:"all" },
+  { id:"no-2", icon:"comment", title:"応援コメントが届きました", body:"あなたの投稿「県予選2回戦」に山路 直卓さんがコメントしました。", createdAt:"2026-06-20T19:05:00+09:00", unread:true, audience:"active" },
+  { id:"no-3", icon:"event", title:"観戦会のお知らせ", body:"6/28「県予選3回戦 OB合同観戦会」の参加者が30名を超えました。", createdAt:"2026-06-19T17:00:00+09:00", unread:false, audience:"ob" },
+  { id:"no-4", icon:"schedule", title:"次の試合が近づいています", body:"6/28（日）13:00 県予選3回戦 vs 流通経済大柏。観戦予定はお済みですか？", createdAt:"2026-06-18T10:00:00+09:00", unread:false, audience:"all" },
+  { id:"no-5", icon:"system", title:"年間支援ランクが更新されました", body:"今年の支援額が30,000円を超え、シルバーランクになりました🥈", createdAt:"2026-06-10T12:35:00+09:00", unread:false, audience:"ob" },
+];
+
+/* ---------- 状態 ---------- */
+const ROLE_KEY="yell-connect:role";
+const clone=(x)=>JSON.parse(JSON.stringify(x));
+let idSeq=1000; const newId=(p)=>p+"-"+(++idSeq);
+
+const state={
+  role:(localStorage.getItem(ROLE_KEY)==="active"||localStorage.getItem(ROLE_KEY)==="ob")?localStorage.getItem(ROLE_KEY):"ob",
+  route:"home",
+  posts:clone(seedPosts),
+  wishlist:clone(seedWishlist),
+  donations:clone(seedDonations),
+  events:clone(seedEvents),
+  schedule:clone(seedSchedule),
+  liked:new Set(),
+  watched:new Set(),
+  openComments:new Set(),
+  boardTab:"大会情報",
+  draftCat:"活動報告",
+  draftEmoji:"",
+  modal:null,
+};
+const currentUser=()=>users[state.role];
+const yearlyTotal=()=>state.donations.reduce((s,d)=>s+d.amount,0);
+
+/* ---------- ヘルパー ---------- */
+const NOW=new Date("2026-06-21T12:00:00+09:00").getTime();
+const WD=["日","月","火","水","木","金","土"];
+const yen=(n)=>"¥"+Number(n).toLocaleString("ja-JP");
+function fmtDT(iso){const d=new Date(iso);const h=String(d.getHours()).padStart(2,"0");const m=String(d.getMinutes()).padStart(2,"0");return `${d.getMonth()+1}月${d.getDate()}日(${WD[d.getDay()]}) ${h}:${m}`;}
+function fmtD(iso){const d=new Date(iso);return `${d.getMonth()+1}/${d.getDate()}(${WD[d.getDay()]})`;}
+function timeAgo(iso){const diff=NOW-new Date(iso).getTime();const min=Math.floor(diff/60000);if(min<1)return"たった今";if(min<60)return min+"分前";const hr=Math.floor(min/60);if(hr<24)return hr+"時間前";const day=Math.floor(hr/24);if(day<7)return day+"日前";return fmtD(iso);}
+const isPast=(iso)=>new Date(iso).getTime()<NOW;
+function esc(s){return String(s).replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+const RANK_TH={bronze:0,silver:30000,gold:70000};
+const RANK_META={
+  bronze:{label:"ブロンズ",emoji:"🥉",grad:"linear-gradient(135deg,#d97706,#b45309)"},
+  silver:{label:"シルバー",emoji:"🥈",grad:"linear-gradient(135deg,#cbd5e1,#64748b)"},
+  gold:{label:"ゴールド",emoji:"🥇",grad:"linear-gradient(135deg,#fde047,#f59e0b)"},
+};
+function rankInfo(total){
+  let rank="bronze";
+  if(total>=RANK_TH.gold)rank="gold"; else if(total>=RANK_TH.silver)rank="silver";
+  let nextRank=null,nextTh=null;
+  if(rank==="bronze"){nextRank="silver";nextTh=RANK_TH.silver;}
+  else if(rank==="silver"){nextRank="gold";nextTh=RANK_TH.gold;}
+  return {rank,...RANK_META[rank],nextRank,nextTh,remaining:nextTh!=null?Math.max(0,nextTh-total):null};
+}
+
+const GRAD={
+  emerald:"linear-gradient(135deg,#34d399,#14b8a6)",
+  yell:"linear-gradient(135deg,#fb923c,#f59e0b)",
+  orange:"linear-gradient(135deg,#fb923c,#ef4444)",
+  sky:"linear-gradient(135deg,#38bdf8,#3b82f6)",
+  pink:"linear-gradient(135deg,#f472b6,#f43f5e)",
+  cyan:"linear-gradient(135deg,#22d3ee,#14b8a6)",
+  violet:"linear-gradient(135deg,#a78bfa,#a855f7)",
+  brand:"linear-gradient(135deg,#fb923c,#ef4444)",
+};
+const grad=(k)=>GRAD[k]||GRAD.brand;
+
+const CAT_COLOR={
+  "練習":"background:var(--yell100);color:var(--yell700)",
+  "試合結果":"background:var(--ember100);color:var(--ember600)",
+  "活動報告":"background:var(--emerald100);color:var(--emerald700)",
+  "お知らせ":"background:var(--violet100);color:var(--violet700)",
+};
+const TYPE_META={
+  "練習":{em:"🏋️",color:"background:var(--yell100);color:var(--yell700)"},
+  "試合":{em:"⚔️",color:"background:var(--ember100);color:var(--ember600)"},
+  "大会":{em:"🏆",color:"background:var(--violet100);color:var(--violet700)"},
+};
+const BOARD_COLOR={
+  "大会情報":"background:var(--ember100);color:var(--ember600)",
+  "活動報告":"background:var(--yell100);color:var(--yell700)",
+  "雑談":"background:var(--violet100);color:var(--violet700)",
+};
+const KIND_COLOR={
+  "観戦会":"background:var(--ember100);color:var(--ember600)",
+  "OB戦":"background:var(--yell100);color:var(--yell700)",
+  "懇親会":"background:var(--violet100);color:var(--violet700)",
+};
+const NOTICE_ICON={support:"🎁",comment:"💬",event:"💞",schedule:"📅",system:"🔔"};
+
+/* ---------- 共通パーツ ---------- */
+function avatar(emoji,role,size){const ring=role==="ob"?"ring-ob":role==="active"?"ring-active":"";return `<div class="avatar av-${size||"md"} ${ring}">${emoji}</div>`;}
+function progress(v,max,onDark){const pct=max===0?0:Math.min(100,Math.round((v/max)*100));return `<div class="progress ${onDark?"ondark":""}"><i style="width:${pct}%"></i></div>`;}
+function media(emoji,bg,height){return `<div class="media" style="background:${grad(bg)};height:${height||120}px"><span class="em">${emoji}</span><span class="ph">PHOTO</span></div>`;}
+function secHead(title,em,action){return `<div class="sec-head"><h2 class="sec-title">${em?em+" ":""}${title}</h2>${action||""}</div>`;}
+
+/* ---------- 投稿カード ---------- */
+function postCard(p){
+  const liked=state.liked.has(p.id);
+  const open=state.openComments.has(p.id);
+  const commentsHtml=p.comments.map(c=>`
+    <div class="row" style="gap:8px;align-items:flex-start;margin-top:10px">
+      ${avatar(c.authorAvatar,c.authorRole,"sm")}
+      <div class="grow" style="background:var(--warmbg);border-radius:12px;padding:8px 10px">
+        <div class="row" style="gap:5px"><b style="font-size:11px">${esc(c.authorName)}</b><span class="rbadge ${c.authorRole}">${c.authorRole==="ob"?"OB/OG":"現役生"}</span></div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:2px;line-height:1.5">${esc(c.body)}</div>
+      </div>
+    </div>`).join("");
+  return `<div class="card">
+    <div class="row between">
+      <div class="row" style="gap:8px">
+        ${avatar(p.authorAvatar,p.authorRole,"md")}
+        <div>
+          <div class="row" style="gap:5px"><b style="font-size:13px">${esc(p.authorName)}</b><span class="rbadge ${p.authorRole}">${p.authorRole==="ob"?"OB/OG":"現役生"}</span></div>
+          <div class="xs muted">${timeAgo(p.createdAt)}</div>
+        </div>
+      </div>
+      <span class="chip" style="${CAT_COLOR[p.category]}">${p.category}</span>
+    </div>
+    <div style="font-size:13px;line-height:1.7;margin:10px 0">${esc(p.body)}</div>
+    ${p.imageEmoji?media(p.imageEmoji,p.imageBg,140):""}
+    <div class="row between" style="margin-top:12px">
+      <button class="pill" data-action="like" data-id="${p.id}" style="padding:6px 12px;${liked?"background:var(--ember100);color:var(--ember600)":""}">
+        ${liked?"❤️":"🤍"} <span style="margin-left:4px">${p.likeCount}</span>
+      </button>
+      <button class="pill" data-action="toggleComments" data-id="${p.id}" style="padding:6px 12px">💬 <span style="margin-left:4px">${p.comments.length}</span></button>
+    </div>
+    ${state.role==="ob"&&!open?`<div class="small" style="color:var(--yell600);font-weight:700;margin-top:10px;cursor:pointer" data-action="toggleComments" data-id="${p.id}">応援コメントで力になろう →</div>`:""}
+    ${open?`<div style="margin-top:6px">
+        ${commentsHtml}
+        <div class="row" style="gap:6px;margin-top:10px">
+          <input type="text" id="ci-${p.id}" placeholder="応援コメントを送る…" />
+          <button class="btn btn-grad" data-action="addComment" data-id="${p.id}" style="padding:9px 14px;font-size:13px;white-space:nowrap">送信</button>
+        </div>
+      </div>`:""}
+  </div>`;
+}
+
+/* ---------- 投稿フォーム ---------- */
+function newPostForm(){
+  const cats=["練習","試合結果","活動報告","お知らせ"];
+  const emojis=["🏉","💪","🔥","🌤️","🏆","📣","🍙","🤝"];
+  return `<div class="card">
+    <div class="row" style="gap:8px;margin-bottom:10px">${avatar(currentUser().avatar,"active","sm")}<b style="font-size:13px">いまの活動をシェアしよう</b></div>
+    <textarea id="np-text" rows="3" placeholder="練習や試合のようすを書いてみよう…"></textarea>
+    <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:10px">
+      ${cats.map(c=>`<button class="cat-pill ${state.draftCat===c?"sel":""}" data-action="pickCat" data-cat="${c}">${c}</button>`).join("")}
+    </div>
+    <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center">
+      <span class="xs muted">写真:</span>
+      ${emojis.map(e=>`<button class="emoji-pill ${state.draftEmoji===e?"sel":""}" data-action="pickEmoji" data-emoji="${e}">${e}</button>`).join("")}
+    </div>
+    <button class="btn btn-grad btn-block" data-action="addPost" style="margin-top:12px">投稿する</button>
+  </div>`;
+}
+
+/* ---------- 欲しい物カード ---------- */
+function wishCard(w){
+  const remaining=w.needed-w.funded;
+  const complete=remaining<=0;
+  const prColor=w.priority==="高"?"background:var(--ember100);color:var(--ember600)":w.priority==="中"?"background:var(--yell100);color:var(--yell700)":"background:#e5e7eb;color:#6b7280";
+  return `<div class="card">
+    <div class="row" style="gap:12px;align-items:flex-start">
+      <div style="width:64px;flex:none">${media(w.emoji,w.bg,64)}</div>
+      <div class="grow">
+        <div class="row between" style="align-items:flex-start">
+          <b style="font-size:13px;line-height:1.4">${esc(w.name)}</b>
+          <span class="chip" style="${prColor};flex:none;margin-left:6px">優先度${w.priority}</span>
+        </div>
+        <div class="xs muted" style="margin-top:3px;line-height:1.5">${esc(w.reason)}</div>
+        <div class="row between" style="margin-top:8px">
+          <span class="small muted">単価 ${yen(w.price)}</span>
+          <span class="small" style="font-weight:800;color:${complete?"var(--emerald600)":"var(--ember600)"}">${complete?"充足ずみ ✓":"あと"+remaining+"/"+w.needed+"個"}</span>
+        </div>
+        <div style="margin-top:6px">${progress(w.funded,w.needed)}</div>
+      </div>
+    </div>
+    ${state.role==="ob"
+      ? `<button class="btn ${complete?"":"btn-grad"} btn-block" data-action="supportItem" data-id="${w.id}" ${complete?"disabled":""} style="margin-top:12px">${complete?"おかげさまで充足しました":"🎁 この物品を支援する"}</button>`
+      : `<div class="small" style="text-align:center;color:var(--yell600);font-weight:700;background:var(--yell50);border-radius:999px;padding:9px;margin-top:12px">OB/OGからの支援を募集中</div>`}
+  </div>`;
+}
+
+/* ---------- 金額支援カード ---------- */
+function donationCard(){
+  const presets=[1000,3000,5000];
+  return `<div class="card">
+    <div class="row" style="gap:6px;margin-bottom:4px"><b style="font-size:14px">💴 金額で支援する</b></div>
+    <div class="xs muted" style="margin-bottom:12px">ワンタップで気軽に応援できます</div>
+    <div class="row" style="gap:8px">
+      ${presets.map(a=>`<button class="btn btn-grad" data-action="donate" data-amount="${a}" style="flex:1;padding:12px 0;font-size:14px">${yen(a)}</button>`).join("")}
+    </div>
+    <div class="row" style="gap:6px;margin-top:10px">
+      <input type="number" id="don-free" placeholder="自由入力（円）" min="100" step="100" />
+      <button class="btn btn-grad" data-action="donateFree" style="padding:9px 16px;font-size:13px;white-space:nowrap">支援</button>
+    </div>
+  </div>`;
+}
+
+/* ---------- コミュニティ サブナビ ---------- */
+function communityNav(){
+  const items=[["community","👥 同期"],["board","💬 掲示板"],["events","💞 イベント"]];
+  return `<div class="row" style="gap:6px;background:#fff;border-radius:999px;padding:4px;box-shadow:var(--shadow)">
+    ${items.map(([r,l])=>`<div data-action="nav" data-route="${r}" style="flex:1;text-align:center;padding:8px 0;border-radius:999px;font-size:12px;font-weight:800;cursor:pointer;${state.route===r?"background:var(--grad);color:#fff":"color:var(--mut)"}">${l}</div>`).join("")}
+  </div>`;
+}
+
+/* ============================================================
+   画面
+   ============================================================ */
+function clubHero(){
+  return `<div class="hero grad">
+    <div class="row" style="gap:12px">
+      <div style="width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:30px;backdrop-filter:blur(4px)">${club.emblem}</div>
+      <div class="grow">
+        <div class="xs" style="opacity:.85">${club.schoolName}</div>
+        <div style="font-size:18px;font-weight:800;line-height:1.2">${club.clubName}</div>
+        <div class="xs" style="opacity:.9;margin-top:2px">「${club.catchphrase}」</div>
+      </div>
+    </div>
+    <div class="row" style="gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2)">
+      <div class="hero-stat"><b>${club.memberCount}</b><span>現役部員</span></div>
+      <div class="hero-stat"><b>${club.obCount}</b><span>登録OB/OG</span></div>
+      <div class="hero-stat"><b>${club.established}</b><span>創部</span></div>
+    </div>
+  </div>`;
+}
+function nextEventCard(){
+  const next=state.schedule.filter(e=>!isPast(e.date)).sort((a,b)=>+new Date(a.date)-+new Date(b.date))[0];
+  if(!next)return"";
+  const watched=state.watched.has(next.id);
+  return `<div class="card" data-action="nav" data-route="schedule" style="cursor:pointer">
+    <div class="row between"><span class="small" style="font-weight:800;color:var(--yell600)">📅 次の${next.type}</span><span class="muted">›</span></div>
+    <div style="font-weight:800;font-size:14px;margin-top:4px">${esc(next.title)}</div>
+    <div class="row small muted" style="gap:8px;margin-top:4px"><span>${fmtDT(next.date)}</span><span>📍${esc(next.place)}</span></div>
+    ${state.role==="ob"?`<button class="btn ${watched?"":"btn-grad"} btn-block" data-action="watch" data-id="${next.id}" data-stop="1" style="margin-top:10px;${watched?"background:var(--emerald500);color:#fff":""}">${watched?"観戦予定に登録済み ✓":"観戦予定にする"}</button>`:""}
+  </div>`;
+}
+function quickLink(route,ic,lb,sub){return `<div class="ql" data-action="nav" data-route="${route}"><span class="ic">${ic}</span><span class="lb">${lb}</span><span class="sub">${sub}</span></div>`;}
+
+function homeActive(){
+  const tn=state.wishlist.reduce((s,w)=>s+w.needed,0);
+  const tf=state.wishlist.reduce((s,w)=>s+w.funded,0);
+  return `<div class="page stack gap4">
+    ${clubHero()}
+    <div class="row" style="gap:12px">${quickLink("feed","📰","活動を投稿","練習・試合をシェア")}${quickLink("support","🎁","欲しい物リスト","支援を募集する")}</div>
+    ${nextEventCard()}
+    <div class="card" data-action="nav" data-route="support" style="cursor:pointer">
+      <div class="row between"><b style="font-size:14px">🤝 欲しい物の充足状況</b><span class="small" style="font-weight:800;color:var(--ember600)">${tf}/${tn}個</span></div>
+      <div style="margin-top:8px">${progress(tf,tn)}</div>
+      <div class="xs muted" style="margin-top:8px">OB/OGの皆さんから ${tf} 個の支援が届いています。ありがとうございます！</div>
+    </div>
+    <div>${secHead("みんなの活動","📰",`<span class="link" data-action="nav" data-route="feed">すべて見る ›</span>`)}
+      <div class="stack gap4">${state.posts.slice(0,2).map(postCard).join("")}</div></div>
+  </div>`;
+}
+function homeOb(){
+  const total=yearlyTotal(); const r=rankInfo(total);
+  const urgent=state.wishlist.filter(w=>w.funded<w.needed&&w.priority==="高");
+  const urgentRemain=urgent.reduce((s,w)=>s+(w.needed-w.funded),0);
+  return `<div class="page stack gap4">
+    ${clubHero()}
+    <div class="card" data-action="nav" data-route="mypage" style="cursor:pointer">
+      <div class="row between">
+        <div><div class="xs muted">${currentUser().name} さんの今年の支援</div><div style="font-size:24px;font-weight:800;margin-top:2px">${yen(total)}</div></div>
+        <div style="border-radius:16px;background:${r.grad};color:#fff;padding:8px 12px;text-align:center"><div style="font-size:24px;line-height:1">${r.emoji}</div><div class="xs" style="font-weight:800;margin-top:2px">${r.label}</div></div>
+      </div>
+      ${r.remaining!=null?`<div style="margin-top:12px"><div class="row between xs muted" style="margin-bottom:4px"><span>次のランクまで</span><span style="font-weight:800;color:var(--yell600)">あと ${yen(r.remaining)}</span></div>${progress(total,r.nextTh)}</div>`:""}
+      <div class="row small muted" style="gap:4px;margin-top:10px">📈 累計 ${state.donations.length} 件の応援を届けました</div>
+    </div>
+    ${urgent.length?`<div class="hero grad" data-action="nav" data-route="support" style="cursor:pointer">
+      <div style="font-size:14px;font-weight:800">✨ いま応援が必要です</div>
+      <div class="small" style="opacity:.92;margin-top:6px;line-height:1.6">「${esc(urgent[0].name)}」など優先度の高い物品があと ${urgentRemain} 個不足しています。</div>
+      <div style="display:inline-flex;gap:4px;align-items:center;background:rgba(255,255,255,.2);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:800;margin-top:10px;backdrop-filter:blur(4px)">🎁 欲しい物リストを見る ›</div>
+    </div>`:""}
+    ${nextEventCard()}
+    <div class="row" style="gap:12px">${quickLink("community","👥","コミュニティ","同期 "+alumniGroups.length+" 期が活動中")}${quickLink("board","💬","掲示板","OBの最新トピック")}</div>
+    <div>${secHead("後輩たちの活動","❤️",`<span class="link" data-action="nav" data-route="feed">すべて見る ›</span>`)}
+      <div class="stack gap4">${state.posts.slice(0,2).map(postCard).join("")}</div></div>
+  </div>`;
+}
+
+function feedScreen(){
+  return `<div class="page stack gap4">
+    <div class="row between"><h1 class="h1">活動フィード</h1><span class="chip" data-action="nav" data-route="schedule" style="background:var(--yell50);color:var(--yell600);cursor:pointer;padding:7px 11px">📅 スケジュール ›</span></div>
+    ${state.role==="active"?newPostForm():`<div style="border-radius:16px;background:var(--gradsoft);border:1px solid var(--yell100);padding:14px;font-size:12px;color:var(--yell700);line-height:1.6">現役生の活動に「いいね」と応援コメントを送って、世代を超えて応援しよう！💪</div>`}
+    <div class="stack gap4">${state.posts.map(postCard).join("")}</div>
+  </div>`;
+}
+
+function scheduleScreen(){
+  const up=state.schedule.filter(e=>!isPast(e.date)).sort((a,b)=>+new Date(a.date)-+new Date(b.date));
+  const past=state.schedule.filter(e=>isPast(e.date)).sort((a,b)=>+new Date(b.date)-+new Date(a.date));
+  const upCard=(ev)=>{
+    const watched=state.watched.has(ev.id); const m=TYPE_META[ev.type];
+    const w=ev.watchers+(watched?1:0);
+    return `<div class="card">
+      <div class="row" style="gap:8px;margin-bottom:8px"><span class="chip" style="${m.color}">${m.em} ${ev.type}</span><b class="small" style="color:var(--ink2)">${fmtDT(ev.date)}</b></div>
+      <div style="font-weight:800;font-size:14px;line-height:1.4">${esc(ev.title)}</div>
+      <div class="row small muted" style="gap:3px;margin-top:4px">📍 ${esc(ev.place)}</div>
+      <div class="row between" style="margin-top:12px">
+        <span class="small muted">👀 観戦予定 <b style="color:var(--ink2)">${w}</b>名</span>
+        ${state.role==="ob"?`<button class="btn ${watched?"":"btn-grad"}" data-action="watch" data-id="${ev.id}" style="padding:7px 14px;font-size:12px;${watched?"background:var(--emerald500);color:#fff":""}">${watched?"観戦予定に登録済み ✓":"観戦予定にする"}</button>`:""}
+      </div>
+    </div>`;
+  };
+  const resCard=(ev)=>{
+    const oc=ev.result.outcome==="勝"?"background:var(--ember500)":ev.result.outcome==="負"?"background:#9ca3af":"background:var(--yell500)";
+    return `<div class="card row" style="gap:12px;align-items:center">
+      <div style="width:44px;height:44px;border-radius:12px;color:#fff;font-weight:800;display:grid;place-items:center;flex:none;${oc}">${ev.result.outcome}</div>
+      <div class="grow"><div style="font-weight:800;font-size:13px" class="truncate">${esc(ev.title)}</div><div class="xs muted">${fmtDT(ev.date)}</div>${ev.result.note?`<div class="xs" style="color:var(--yell600);margin-top:2px">${esc(ev.result.note)}</div>`:""}</div>
+      <div style="font-weight:800;font-size:16px;flex:none">${ev.result.score}</div>
+    </div>`;
+  };
+  return `<div class="page stack gap5">
+    <div class="row" style="gap:8px"><button class="iconbtn" data-action="nav" data-route="feed">←</button><h1 class="h1">スケジュール</h1></div>
+    <div>${secHead("今後の予定")}<div class="stack gap3">${up.map(upCard).join("")}</div></div>
+    <div>${secHead("過去の結果（アーカイブ）","🏆")}<div class="stack gap2">${past.map(resCard).join("")}</div></div>
+  </div>`;
+}
+
+function supportScreen(){
+  return `<div class="page stack gap5">
+    <div class="hero grad">
+      <div class="row" style="gap:8px"><span style="font-size:22px">🤝</span><h1 class="h1">サポート</h1></div>
+      <div class="xs" style="opacity:.9;margin-top:4px">${club.schoolName} ${club.clubName}</div>
+      <div class="small" style="opacity:.85;margin-top:8px;line-height:1.6">${state.role==="ob"?"欲しい物リストから物品を、または金額で、ワンタップで応援できます。":"現在、部活が必要としている物品の一覧です。OB/OGの皆さんに支援をお願いしています。"}</div>
+    </div>
+    ${state.role==="ob"?donationCard():""}
+    <div>${secHead("欲しい物リスト","🛍️")}<div class="stack gap3">${state.wishlist.map(wishCard).join("")}</div></div>
+    <div class="note">ℹ️ 支援した物品はメーカー・店舗から学校へ直送されます。手数料10%が運営費に充てられ、残りはすべて部活動の支援に使われます。</div>
+  </div>`;
+}
+
+function communityScreen(){
+  const myYear=state.role==="ob"?currentUser().graduationYear:undefined;
+  const sorted=[...alumniGroups].sort((a,b)=>{if(a.graduationYear===myYear)return -1;if(b.graduationYear===myYear)return 1;return b.graduationYear-a.graduationYear;});
+  const gCard=(g)=>{
+    const mine=g.graduationYear===myYear;
+    return `<div class="card" style="${mine?"box-shadow:0 0 0 2px var(--yell400),var(--shadow)":""}">
+      <div class="row" style="gap:12px">
+        <div style="width:48px;height:48px;border-radius:14px;background:var(--gradsoft);display:grid;place-items:center;font-size:22px;flex:none">${g.accentEmoji}</div>
+        <div class="grow"><div class="row" style="gap:6px"><b class="truncate" style="font-size:13px">${g.label}</b>${mine?`<span class="chip" style="background:var(--yell100);color:var(--yell700);flex:none">あなたの同期</span>`:""}</div><div class="xs muted" style="margin-top:2px">👥 登録 ${g.memberCount} 名</div></div>
+      </div>
+      <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:12px">${g.members.slice(0,4).map(m=>`<span class="xs" style="background:var(--warmbg);border:1px solid var(--border);border-radius:999px;padding:4px 8px;color:var(--ink2)">${esc(m)}</span>`).join("")}${g.memberCount>g.members.length?`<span class="xs muted">+${g.memberCount-g.members.length}</span>`:""}</div>
+      <div class="row" style="gap:6px;align-items:flex-start;margin-top:12px;background:var(--warmbg);border-radius:12px;padding:10px"><span>💬</span><span class="small" style="color:var(--ink2);line-height:1.5">${esc(g.recentTopic)}</span></div>
+    </div>`;
+  };
+  return `<div class="page stack gap4">
+    <h1 class="h1">👥 OB/OGコミュニティ</h1>
+    ${communityNav()}
+    <div class="hero grad"><div style="font-size:14px;font-weight:800">✨ 同期でつながる</div><div class="small" style="opacity:.92;margin-top:6px;line-height:1.6">卒業年度ごとの「同期グループ」。懐かしい仲間と再会し、世代を超えて後輩を応援しよう。</div></div>
+    <div class="stack gap3">${sorted.map(gCard).join("")}</div>
+  </div>`;
+}
+
+function boardScreen(){
+  const tabs=["大会情報","活動報告","雑談"];
+  const list=boardPosts.filter(p=>p.board===state.boardTab).sort((a,b)=>+new Date(b.createdAt)-+new Date(a.createdAt));
+  const thread=(p)=>`<div class="card">
+    <div class="row" style="gap:8px;margin-bottom:8px"><span class="chip" style="${BOARD_COLOR[p.board]}">${p.board}</span><span class="xs muted">${timeAgo(p.createdAt)}</span></div>
+    <div style="font-weight:800;font-size:14px;line-height:1.4">${esc(p.title)}</div>
+    <div class="small muted clamp2" style="margin-top:4px;line-height:1.6">${esc(p.body)}</div>
+    <div class="row between" style="margin-top:12px">
+      <div class="row" style="gap:8px">${avatar(p.authorAvatar,null,"sm")}<div><div class="small" style="font-weight:800">${esc(p.authorName)}</div>${p.graduationYear?`<div class="xs muted">${p.graduationYear}年卒</div>`:""}</div></div>
+      <span class="small muted">💬 ${p.replyCount}件の返信</span>
+    </div>
+  </div>`;
+  return `<div class="page stack gap4">
+    <h1 class="h1">💬 OB/OG掲示板</h1>
+    ${communityNav()}
+    <div class="row" style="gap:8px">${tabs.map(t=>`<button class="pill" data-action="boardTab" data-board="${t}" style="flex:1;padding:9px 0;font-size:12px;${state.boardTab===t?"background:#fff;color:var(--ink);box-shadow:var(--shadow)":""}">${t}</button>`).join("")}</div>
+    <div class="stack gap3">${list.length?list.map(thread).join(""):`<div class="muted small" style="text-align:center;padding:32px 0">まだ投稿がありません。</div>`}</div>
+    <button class="btn btn-grad btn-block" data-action="demo">＋ 新しいスレッドを立てる</button>
+  </div>`;
+}
+
+function eventsScreen(){
+  const sorted=[...state.events].sort((a,b)=>+new Date(a.date)-+new Date(b.date));
+  const card=(ev)=>{
+    const full=ev.participants>=ev.capacity&&!ev.joined; const past=isPast(ev.date);
+    let btn;
+    if(state.role==="ob"){
+      let label,style="";
+      if(past){label="開催終了";style="";}
+      else if(ev.joined){label="✓ 参加予定（タップで取消）";style="background:var(--emerald500);color:#fff";}
+      else if(full){label="満員です";}
+      else{label="このイベントに参加する";style="";}
+      btn=`<button class="btn ${(!past&&!full&&!ev.joined)?"btn-grad":(ev.joined&&!past)?"":""} btn-block" data-action="joinEvent" data-id="${ev.id}" ${(past||full)?"disabled":""} style="margin-top:4px;${style}">${label}</button>`;
+    }else{
+      btn=`<div class="small muted" style="text-align:center;padding:8px;margin-top:4px">OB/OG限定のイベントです</div>`;
+    }
+    return `<div class="card" style="padding:0;overflow:hidden">
+      <div class="row gradsoft" style="gap:12px;padding:14px">
+        <div style="width:48px;height:48px;border-radius:14px;background:#fff;display:grid;place-items:center;font-size:22px;flex:none;box-shadow:var(--shadow)">${ev.emoji}</div>
+        <div class="grow"><span class="chip" style="${KIND_COLOR[ev.kind]}">${ev.kind}</span><div style="font-weight:800;font-size:14px;line-height:1.4;margin-top:4px">${esc(ev.title)}</div></div>
+      </div>
+      <div style="padding:14px" class="stack gap2">
+        <div class="row small" style="gap:6px;color:var(--ink2)">🕒 ${fmtDT(ev.date)}</div>
+        <div class="row small" style="gap:6px;color:var(--ink2)">📍 ${esc(ev.place)}</div>
+        <div class="xs muted">主催：${esc(ev.hostName)}</div>
+        <div style="padding-top:4px">
+          <div class="row between small" style="margin-bottom:4px"><span class="muted">👥 参加 <b style="color:var(--ink2)">${ev.participants}</b> / ${ev.capacity}名</span>${full?`<span style="color:var(--ember600);font-weight:800">満員間近</span>`:""}</div>
+          ${progress(ev.participants,ev.capacity)}
+        </div>
+        ${btn}
+      </div>
+    </div>`;
+  };
+  return `<div class="page stack gap4">
+    <h1 class="h1">💞 OB/OGイベント</h1>
+    ${communityNav()}
+    <div class="stack gap3">${sorted.map(card).join("")}</div>
+  </div>`;
+}
+
+function mypageScreen(){
+  if(state.role==="ob"){
+    const total=yearlyTotal(); const r=rankInfo(total);
+    const itemCount=state.donations.filter(d=>d.type==="物品支援").length;
+    const moneyCount=state.donations.filter(d=>d.type==="金額支援").length;
+    const ranks=["bronze","silver","gold"];
+    const donRow=(d)=>`<div class="card row" style="gap:12px;padding:12px;align-items:center">
+      <div style="width:40px;height:40px;border-radius:12px;background:var(--gradsoft);display:grid;place-items:center;font-size:20px;flex:none">${d.emoji}</div>
+      <div class="grow"><div class="small truncate" style="font-weight:800">${esc(d.label)}</div><div class="row" style="gap:6px;margin-top:2px"><span class="chip" style="${d.type==="物品支援"?"background:var(--yell100);color:var(--yell700)":"background:var(--emerald100);color:var(--emerald700)"}">${d.type}</span><span class="xs muted">${fmtD(d.date)}</span></div></div>
+      <div style="font-weight:800;font-size:14px;flex:none">${yen(d.amount)}</div>
+    </div>`;
+    const rankRow=(rk)=>{
+      const reached=total>=RANK_TH[rk]; const cur=r.rank===rk; const m=RANK_META[rk];
+      return `<div class="row" style="gap:12px;border-radius:12px;padding:10px;${cur?"background:var(--gradsoft);box-shadow:0 0 0 1px var(--yell200)":""}">
+        <span style="font-size:24px;${reached?"":"filter:grayscale(1);opacity:.4"}">${m.emoji}</span>
+        <div class="grow"><div class="small" style="font-weight:800">${m.label}${cur?`<span class="chip" style="background:var(--yell100);color:var(--yell700);margin-left:6px">現在</span>`:""}</div><div class="xs muted">年間 ${yen(RANK_TH[rk])} 以上</div></div>
+        ${reached?`<span class="xs" style="font-weight:800;color:var(--emerald600)">達成済</span>`:""}
+      </div>`;
+    };
+    const stat=(ic,n,l)=>`<div class="card" style="flex:1;text-align:center;padding:12px"><div style="font-size:18px">${ic}</div><div style="font-size:18px;font-weight:800;margin-top:4px">${n}</div><div class="xs muted">${l}</div></div>`;
+    return `<div class="page stack gap5">
+      <div class="hero" style="background:${r.grad}">
+        <div class="row" style="gap:12px">
+          <div style="width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.25);display:grid;place-items:center;font-size:28px;backdrop-filter:blur(4px)">${currentUser().avatar}</div>
+          <div class="grow"><div style="font-size:18px;font-weight:800;line-height:1.2">${currentUser().name}</div><div class="xs" style="opacity:.9">${currentUser().position}</div></div>
+          <div style="text-align:center"><div style="font-size:30px;line-height:1">${r.emoji}</div><div class="xs" style="font-weight:800;margin-top:2px">${r.label}</div></div>
+        </div>
+        <div style="margin-top:16px;border-radius:12px;background:rgba(255,255,255,.15);padding:12px;backdrop-filter:blur(4px)">
+          <div class="xs" style="opacity:.85">2026年の支援総額</div><div style="font-size:28px;font-weight:800;margin-top:2px">${yen(total)}</div>
+          ${r.remaining!=null?`<div style="margin-top:8px"><div class="row between xs" style="opacity:.9;margin-bottom:4px"><span>次の${RANK_META[r.nextRank].label}ランクまで</span><span style="font-weight:800">あと ${yen(r.remaining)}</span></div>${progress(total,r.nextTh,true)}</div>`:`<div class="xs" style="opacity:.9;margin-top:8px">最高ランク到達！ありがとうございます🎉</div>`}
+        </div>
+      </div>
+      <div class="row" style="gap:12px">${stat("📈",state.donations.length,"支援回数")}${stat("📦",itemCount,"物品支援")}${stat("🪙",moneyCount,"金額支援")}</div>
+      <div>${secHead("支援ランク","🏅")}<div class="card stack gap2">${ranks.map(rankRow).join("")}</div></div>
+      <div>${secHead("支援履歴","🎁",`<span class="small muted">${state.donations.length}件</span>`)}<div class="stack gap2">${state.donations.map(donRow).join("")}</div></div>
+      <button class="btn btn-grad btn-block" data-action="nav" data-route="support">❤️ 続けて応援する</button>
+    </div>`;
+  }
+  // 現役生
+  const my=state.posts.filter(p=>p.authorRole==="active");
+  const likes=my.reduce((s,p)=>s+p.likeCount,0);
+  const comments=my.reduce((s,p)=>s+p.comments.length,0);
+  const stat=(ic,n,l)=>`<div class="card" style="flex:1;text-align:center;padding:12px"><div style="font-size:18px">${ic}</div><div style="font-size:18px;font-weight:800;margin-top:4px">${n}</div><div class="xs muted">${l}</div></div>`;
+  return `<div class="page stack gap5">
+    <div class="hero grad">
+      <div class="row" style="gap:12px">
+        <div style="width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.25);display:grid;place-items:center;font-size:28px;backdrop-filter:blur(4px)">${currentUser().avatar}</div>
+        <div class="grow"><div class="row" style="gap:6px"><div style="font-size:18px;font-weight:800;line-height:1.2">${currentUser().name}</div><span class="rbadge active">現役生</span></div><div class="xs" style="opacity:.9">${currentUser().grade}</div><div class="xs" style="opacity:.9">${currentUser().position}</div></div>
+      </div>
+      <div class="small" style="opacity:.92;margin-top:12px;line-height:1.6">${currentUser().bio}</div>
+    </div>
+    <div class="row" style="gap:12px">${stat("💞",my.length,"投稿数")}${stat("❤️",likes,"もらった応援")}${stat("🏆",comments,"コメント")}</div>
+    <div style="border-radius:16px;background:var(--gradsoft);border:1px solid var(--yell100);padding:16px;text-align:center">
+      <div style="font-size:22px">🎁</div>
+      <div class="small" style="color:var(--yell700);margin-top:8px;line-height:1.7">OB/OGの皆さんからの支援とコメントが、ここに届きます。<br>活動を投稿して、応援の輪を広げよう！</div>
+      <button class="btn btn-grad" data-action="nav" data-route="feed" style="margin-top:12px;padding:8px 18px;font-size:12px">活動を投稿する ›</button>
+    </div>
+  </div>`;
+}
+
+function notificationsScreen(){
+  const list=notices.filter(n=>n.audience==="all"||n.audience===state.role).sort((a,b)=>+new Date(b.createdAt)-+new Date(a.createdAt));
+  const row=(n)=>`<div class="card row" style="gap:12px;align-items:flex-start;${n.unread?"":"opacity:.7"}">
+    <div style="width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:18px;flex:none;background:var(--warmbg)">${NOTICE_ICON[n.icon]}</div>
+    <div class="grow"><div class="row" style="gap:6px"><b style="font-size:13px">${esc(n.title)}</b>${n.unread?`<span style="width:6px;height:6px;border-radius:999px;background:var(--ember500);flex:none"></span>`:""}</div><div class="small muted" style="margin-top:2px;line-height:1.6">${esc(n.body)}</div><div class="xs muted" style="margin-top:4px">${timeAgo(n.createdAt)}</div></div>
+  </div>`;
+  return `<div class="page stack gap4">
+    <div class="row" style="gap:8px"><button class="iconbtn" data-action="nav" data-route="home">←</button><h1 class="h1">お知らせ</h1></div>
+    <div class="stack gap2">${list.length?list.map(row).join(""):`<div class="muted small" style="text-align:center;padding:40px 0">お知らせはありません。</div>`}</div>
+  </div>`;
+}
+
+/* ---------- トップ/ボトム ---------- */
+function renderTop(){
+  const unread=notices.filter(n=>n.unread).length;
+  document.getElementById("topbar").outerHTML=`<div class="topbar" id="topbar">
+    <div class="logo" data-action="nav" data-route="home"><span class="lg">🔥</span><b><span class="o">エール</span><span class="r">コネクト</span></b></div>
+    <div class="top-right">
+      <div class="switch">
+        <button class="${state.role==="active"?"on-active":""}" data-action="setRole" data-role="active">現役生</button>
+        <button class="${state.role==="ob"?"on-ob":""}" data-action="setRole" data-role="ob">OB/OG</button>
+      </div>
+      <button class="bell" data-action="nav" data-route="notifications">🔔${unread>0?`<span class="badge-dot">${unread}</span>`:""}</button>
+    </div>
+  </div>`;
+}
+function renderBottom(){
+  const tabs=[
+    {r:"home",ic:"🏠",lb:"ホーム",on:()=>state.route==="home"},
+    {r:"feed",ic:"📰",lb:"活動",on:()=>state.route==="feed"||state.route==="schedule"},
+    {r:"support",ic:"🤝",lb:"サポート",on:()=>state.route==="support"},
+    {r:"community",ic:"👥",lb:"コミュニティ",on:()=>["community","board","events"].includes(state.route)},
+    {r:"mypage",ic:"👤",lb:"マイページ",on:()=>state.route==="mypage"},
+  ];
+  document.getElementById("bottomnav").outerHTML=`<nav class="bottomnav" id="bottomnav">${tabs.map(t=>`<a class="${t.on()?"on":""}" data-action="nav" data-route="${t.r}"><span class="ic">${t.ic}</span><span class="lb">${t.lb}</span></a>`).join("")}</nav>`;
+}
+function renderModal(){
+  const root=document.getElementById("modal-root");
+  if(!state.modal){root.innerHTML="";return;}
+  const m=state.modal;
+  root.innerHTML=`<div class="overlay" data-action="closeModal">
+    <div class="sheet" data-stop="1">
+      <div class="check">✓</div>
+      <div style="font-size:18px;font-weight:800">支援が完了しました！</div>
+      <div class="small muted" style="margin-top:6px">${m.kind}</div>
+      <div style="margin:16px 0;background:var(--gradsoft);border-radius:16px;padding:16px">
+        <div style="font-size:36px">${m.emoji}</div>
+        <div style="font-weight:800;margin-top:6px">${esc(m.label)}</div>
+        <div style="font-size:24px;font-weight:800;color:var(--ember600);margin-top:4px">${yen(m.amount)}</div>
+      </div>
+      <div class="note" style="text-align:left">ℹ️ これはデモ用のダミー決済です。実際の請求は発生しません。${club.clubName}を代表して御礼申し上げます。</div>
+      <button class="btn btn-grad btn-block" data-action="closeModal" style="margin-top:16px">閉じる</button>
+    </div>
+  </div>`;
+}
+const SCREENS={home:()=>state.role==="ob"?homeOb():homeActive(),feed:feedScreen,schedule:scheduleScreen,support:supportScreen,community:communityScreen,board:boardScreen,events:eventsScreen,mypage:mypageScreen,notifications:notificationsScreen};
+function render(){
+  renderTop(); renderBottom();
+  document.getElementById("main").innerHTML=(SCREENS[state.route]||SCREENS.home)();
+  renderModal();
+}
+
+/* ---------- イベント ---------- */
+function go(route){state.route=route;document.getElementById("main").scrollTop=0;render();window.scrollTo(0,0);}
+
+document.addEventListener("click",(e)=>{
+  const el=e.target.closest("[data-action]");
+  if(!el)return;
+  const a=el.dataset.action;
+  // 親要素のnav(カード全体クリック)を止めたい子ボタン
+  if(el.dataset.stop) e.stopPropagation();
+
+  switch(a){
+    case "nav": go(el.dataset.route); break;
+    case "setRole":{
+      state.role=el.dataset.role; localStorage.setItem(ROLE_KEY,state.role);
+      // フォーム下書きはロール跨ぎでリセット
+      render(); break;
+    }
+    case "like":{
+      e.stopPropagation();
+      const id=el.dataset.id; const p=state.posts.find(x=>x.id===id);
+      if(state.liked.has(id)){state.liked.delete(id);p.likeCount--;}else{state.liked.add(id);p.likeCount++;}
+      render(); break;
+    }
+    case "toggleComments":{
+      e.stopPropagation();
+      const id=el.dataset.id;
+      if(state.openComments.has(id))state.openComments.delete(id); else state.openComments.add(id);
+      render();
+      if(state.openComments.has(id)){const i=document.getElementById("ci-"+id);if(i)i.focus();}
+      break;
+    }
+    case "addComment":{
+      e.stopPropagation();
+      const id=el.dataset.id; const inp=document.getElementById("ci-"+id);
+      const v=(inp&&inp.value||"").trim(); if(!v)return;
+      const p=state.posts.find(x=>x.id===id); const u=currentUser();
+      p.comments.push({id:newId("c"),authorName:u.name,authorAvatar:u.avatar,authorRole:u.role,body:v,createdAt:new Date().toISOString()});
+      render(); break;
+    }
+    case "pickCat":{ state.draftCat=el.dataset.cat;
+      document.querySelectorAll(".cat-pill").forEach(x=>x.classList.toggle("sel",x.dataset.cat===state.draftCat)); break; }
+    case "pickEmoji":{
+      const em=el.dataset.emoji; state.draftEmoji=(state.draftEmoji===em?"":em);
+      document.querySelectorAll(".emoji-pill").forEach(x=>x.classList.toggle("sel",x.dataset.emoji===state.draftEmoji)); break; }
+    case "addPost":{
+      const ta=document.getElementById("np-text"); const v=(ta&&ta.value||"").trim(); if(!v)return;
+      const u=currentUser();
+      state.posts.unshift({id:newId("post"),authorName:u.name,authorAvatar:u.avatar,authorRole:u.role,createdAt:new Date().toISOString(),category:state.draftCat,body:v,imageEmoji:state.draftEmoji||"",imageBg:"brand",likeCount:0,comments:[]});
+      state.draftEmoji=""; render(); break;
+    }
+    case "supportItem":{
+      const id=el.dataset.id; const w=state.wishlist.find(x=>x.id===id);
+      if(w.funded>=w.needed)return;
+      w.funded=Math.min(w.needed,w.funded+1);
+      state.donations.unshift({id:newId("don"),date:new Date().toISOString(),type:"物品支援",label:w.name,emoji:w.emoji,amount:w.price});
+      state.modal={label:w.name,emoji:w.emoji,amount:w.price,kind:"物品支援"}; render(); break;
+    }
+    case "donate":{
+      const amt=Number(el.dataset.amount);
+      state.donations.unshift({id:newId("don"),date:new Date().toISOString(),type:"金額支援",label:"金額支援",emoji:"💴",amount:amt});
+      state.modal={label:"金額支援",emoji:"💴",amount:amt,kind:"金額支援"}; render(); break;
+    }
+    case "donateFree":{
+      const inp=document.getElementById("don-free"); const amt=Math.floor(Number(inp&&inp.value)); if(!amt||amt<1)return;
+      state.donations.unshift({id:newId("don"),date:new Date().toISOString(),type:"金額支援",label:"金額支援",emoji:"💴",amount:amt});
+      state.modal={label:"金額支援",emoji:"💴",amount:amt,kind:"金額支援"}; render(); break;
+    }
+    case "watch":{
+      e.stopPropagation();
+      const id=el.dataset.id;
+      if(state.watched.has(id))state.watched.delete(id); else state.watched.add(id);
+      render(); break;
+    }
+    case "joinEvent":{
+      const id=el.dataset.id; const ev=state.events.find(x=>x.id===id);
+      ev.joined=!ev.joined; ev.participants+=ev.joined?1:-1; render(); break;
+    }
+    case "boardTab":{ state.boardTab=el.dataset.board; render(); break; }
+    case "closeModal":{
+      // 背景（overlay）クリックは、背景自身をクリックした時のみ閉じる（シート内クリックでは閉じない）
+      if(el.classList.contains("overlay") && e.target!==el) break;
+      state.modal=null; render(); break;
+    }
+    case "demo": break;
+  }
+});
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+import type { ObEvent } from "@/lib/types";
+
+export const obEvents: ObEvent[] = [
+  {
+    id: "ev-1",
+    title: "県予選3回戦 OB合同観戦会",
+    kind: "観戦会",
+    date: "2026-06-28T12:30:00+09:00",
+    place: "千葉県総合スポーツセンター OB席",
+    capacity: 50,
+    participants: 32,
+    joined: false,
+    hostName: "山路 直卓（第43期）",
+    emoji: "📣",
+  },
+  {
+    id: "ev-2",
+    title: "創部60周年記念 OB戦 & 懇親会",
+    kind: "OB戦",
+    date: "2026-09-23T10:00:00+09:00",
+    place: "本校グラウンド → 千葉駅前で懇親会",
+    capacity: 80,
+    participants: 54,
+    joined: true,
+    hostName: "中村 誠（第20期）",
+    emoji: "🏉",
+  },
+  {
+    id: "ev-3",
+    title: "若手OB 交流飲み会",
+    kind: "懇親会",
+    date: "2026-07-05T19:00:00+09:00",
+    place: "千葉中央 個室居酒屋",
+    capacity: 20,
+    participants: 14,
+    joined: false,
+    hostName: "山田 蒼（第55期）",
+    emoji: "🍻",
+  },
+];
