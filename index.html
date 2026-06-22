@@ -126,6 +126,30 @@
   .truncate{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
   .grow{flex:1;min-width:0;}
+
+  /* 実写真（読み込み失敗時は背後の絵文字＋グラデにフォールバック） */
+  .media .cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;z-index:1;}
+  .media .em{position:relative;z-index:0;}
+  .hero{position:relative;overflow:hidden;}
+  .hero>*{position:relative;z-index:1;}
+  .hero .herobg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.30;z-index:0;}
+  /* トースト通知 */
+  .toast{position:absolute;left:50%;bottom:78px;transform:translateX(-50%);z-index:60;background:rgba(31,41,55,.96);color:#fff;font-size:12.5px;font-weight:700;padding:11px 16px;border-radius:999px;box-shadow:var(--shadow2);max-width:90%;text-align:center;line-height:1.5;animation:toastin .25s ease;}
+  @keyframes toastin{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+  /* 検索バー */
+  .search{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:999px;padding:10px 14px;box-shadow:var(--shadow);}
+  .search input{border:0;background:transparent;padding:0;font-size:13px;flex:1;border-radius:0;}
+  .search input:focus{background:transparent;}
+  /* 探す：コミュニティカード */
+  .cm{background:var(--card);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;}
+  .cm .banner{position:relative;height:104px;background:var(--grad);}
+  .cm .banner .cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .cm .banner .ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.5));}
+  .cm .banner .typ{position:absolute;top:8px;left:8px;width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.94);display:grid;place-items:center;font-size:19px;box-shadow:var(--shadow);}
+  .cm .banner .nm{position:absolute;left:12px;right:12px;bottom:8px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.5);}
+  .statebadge{font-size:10px;font-weight:800;padding:3px 9px;border-radius:999px;flex:none;}
+  .req{display:flex;align-items:center;gap:10px;background:var(--warmbg);border-radius:12px;padding:9px 10px;}
+  .seg{display:flex;gap:6px;flex-wrap:wrap;}
 </style>
 </head>
 <body>
@@ -161,7 +185,7 @@ const seedPosts = [
   { id:"post-1", authorName:"佐藤 蓮", authorAvatar:"🧑‍🎓", authorRole:"active",
     createdAt:"2026-06-20T18:30:00+09:00", category:"試合結果",
     body:"県予選2回戦、市立船橋に 24-19 で勝利しました！🔥 後半ロスタイムのトライで逆転。最後まで諦めない全員ラグビーができました。応援してくださった皆さん、本当にありがとうございました！",
-    imageEmoji:"🏉", imageBg:"emerald", likeCount:86,
+    imageId:"1574602904329-56e2f95fb15e", imageEmoji:"🏉", imageBg:"emerald", likeCount:86,
     comments:[
       { id:"c1", authorName:"山路 直卓", authorAvatar:"🧑‍💼", authorRole:"ob", body:"おめでとう！ロスタイムの粘り、OB一同泣きました。次も応援してるぞ！", createdAt:"2026-06-20T19:05:00+09:00" },
       { id:"c2", authorName:"田中 美咲", authorAvatar:"👩‍💼", authorRole:"ob", body:"感動しました！差し入れ送りますね🍙", createdAt:"2026-06-20T20:11:00+09:00" },
@@ -169,27 +193,27 @@ const seedPosts = [
   { id:"post-2", authorName:"顧問 / 鈴木先生", authorAvatar:"👨‍🏫", authorRole:"active",
     createdAt:"2026-06-18T17:00:00+09:00", category:"練習",
     body:"今週は接点の強化週間。タックルバッグを使った反復練習で当たりの精度が上がってきました。消耗が激しく、バッグの中身が破れ始めているのが悩みどころです…💦",
-    imageEmoji:"💪", imageBg:"yell", likeCount:41,
+    imageId:"1534583000938-a375b825ea16", imageEmoji:"💪", imageBg:"yell", likeCount:41,
     comments:[
       { id:"c3", authorName:"高橋 健一", authorAvatar:"🧑‍🔧", authorRole:"ob", body:"タックルバッグ、欲しい物リストに上げてくれれば支援します！", createdAt:"2026-06-18T18:20:00+09:00" },
     ] },
   { id:"post-3", authorName:"渡辺 翔", authorAvatar:"🧑", authorRole:"active",
     createdAt:"2026-06-15T12:10:00+09:00", category:"活動報告",
     body:"OBの皆さんから頂いた新しいラグビーボール、早速使わせてもらっています！グリップが全然違って、パスもキックも安定します。大切に使います！🙏",
-    imageEmoji:"🏉", imageBg:"orange", likeCount:58, comments:[] },
+    imageId:"1558151507-c1aa3d917dbb", imageEmoji:"🏉", imageBg:"orange", likeCount:58, comments:[] },
   { id:"post-4", authorName:"伊藤 大和", authorAvatar:"🧑‍🦱", authorRole:"active",
     createdAt:"2026-06-12T19:45:00+09:00", category:"練習",
     body:"梅雨の合間の貴重な晴れ。グラウンドでセットプレーの確認をしました。スクラムの組み方を一から見直し中です。次の試合までに完成させます！",
-    imageEmoji:"🌤️", imageBg:"sky", likeCount:33,
+    imageId:"1561457909-cbbf7d732ee6", imageEmoji:"🌤️", imageBg:"sky", likeCount:33,
     comments:[
       { id:"c4", authorName:"中村 誠", authorAvatar:"👨‍🦳", authorRole:"ob", body:"スクラムは我々の代の生命線だった。頑張れ！", createdAt:"2026-06-12T21:00:00+09:00" },
     ] },
 ];
 const seedWishlist = [
-  { id:"wish-1", name:"ラグビーボール（試合球）", emoji:"🏉", bg:"orange", price:6800, needed:10, funded:6, priority:"高", reason:"試合球が摩耗し、公式戦で使えるボールが不足しています。" },
-  { id:"wish-2", name:"タックルバッグ", emoji:"🛡️", bg:"yell", price:12000, needed:4, funded:1, priority:"高", reason:"接点強化の要。中身が破れ、買い替えが必要です。" },
-  { id:"wish-3", name:"プロテイン（部全体用）", emoji:"🥤", bg:"pink", price:4500, needed:12, funded:8, priority:"中", reason:"体づくりのため。消耗品なので継続的に必要です。" },
-  { id:"wish-4", name:"練習用ユニフォーム", emoji:"👕", bg:"sky", price:5200, needed:28, funded:12, priority:"中", reason:"新入部員ぶんが不足。揃いのウェアでチーム力を高めたい。" },
+  { id:"wish-1", name:"ラグビーボール（試合球）", emoji:"🏉", bg:"orange", imageId:"1558151507-c1aa3d917dbb", price:6800, needed:10, funded:6, priority:"高", reason:"試合球が摩耗し、公式戦で使えるボールが不足しています。" },
+  { id:"wish-2", name:"タックルバッグ", emoji:"🛡️", bg:"yell", imageId:"1534583000938-a375b825ea16", price:12000, needed:4, funded:1, priority:"高", reason:"接点強化の要。中身が破れ、買い替えが必要です。" },
+  { id:"wish-3", name:"プロテイン（部全体用）", emoji:"🥤", bg:"pink", imageId:"1593095948071-474c5cc2989d", price:4500, needed:12, funded:8, priority:"中", reason:"体づくりのため。消耗品なので継続的に必要です。" },
+  { id:"wish-4", name:"練習用ユニフォーム", emoji:"👕", bg:"sky", imageId:"1577212017184-80cc0da11082", price:5200, needed:28, funded:12, priority:"中", reason:"新入部員ぶんが不足。揃いのウェアでチーム力を高めたい。" },
   { id:"wish-5", name:"アイシング用クーラーボックス", emoji:"🧊", bg:"cyan", price:8900, needed:2, funded:0, priority:"低", reason:"夏場の熱中症・怪我対策に必要です。" },
   { id:"wish-6", name:"キッキングティー", emoji:"🎯", bg:"violet", price:3200, needed:6, funded:6, priority:"低", reason:"プレースキック練習用。おかげさまで充足しました！" },
 ];
@@ -234,6 +258,27 @@ const notices = [
   { id:"no-3", icon:"event", title:"観戦会のお知らせ", body:"6/28「県予選3回戦 OB合同観戦会」の参加者が30名を超えました。", createdAt:"2026-06-19T17:00:00+09:00", unread:false, audience:"ob" },
   { id:"no-4", icon:"schedule", title:"次の試合が近づいています", body:"6/28（日）13:00 県予選3回戦 vs 流通経済大柏。観戦予定はお済みですか？", createdAt:"2026-06-18T10:00:00+09:00", unread:false, audience:"all" },
   { id:"no-5", icon:"system", title:"年間支援ランクが更新されました", body:"今年の支援額が30,000円を超え、シルバーランクになりました🥈", createdAt:"2026-06-10T12:35:00+09:00", unread:false, audience:"ob" },
+  { id:"no-6", icon:"member", title:"参加申請が届いています", body:"あなたがホストの「千葉東 ラグビー部」に2件の参加申請が届いています。承認をお願いします。", createdAt:"2026-06-21T07:45:00+09:00", unread:true, audience:"ob" },
+];
+
+/* 学校×部活コミュニティ（検索・登録・申請・承認のデモ用） */
+const seedCommunities = [
+  { id:"cm-1", school:"千葉東高等学校", club:"ラグビーフットボール部", pref:"千葉県", type:"🏉",
+    photoId:"1529663297269-6d349ec39b57", members:440, since:"1965年", host:"山路 直卓（第43期）", you:"host",
+    requests:[
+      { name:"川村 颯太", role:"active", meta:"1年・FW志望", at:"2026-06-21T07:40:00+09:00" },
+      { name:"佐々木 葵", role:"ob", meta:"第50期（2015年卒）", at:"2026-06-20T22:10:00+09:00" },
+    ] },
+  { id:"cm-2", school:"千葉東高等学校", club:"サッカー部", pref:"千葉県", type:"⚽",
+    photoId:"1431324155629-1a6deb1dec8d", members:198, since:"1968年", host:"大野 亮太（第40期）", you:"pending", requests:[] },
+  { id:"cm-3", school:"県立柏高等学校", club:"サッカー部", pref:"千葉県", type:"⚽",
+    photoId:"1579952363873-27f3bade9f55", members:312, since:"1972年", host:"渡辺 浩二（第38期）", you:"none", requests:[] },
+  { id:"cm-4", school:"市立船橋高等学校", club:"硬式野球部", pref:"千葉県", type:"⚾",
+    photoId:"1546497055-4b9e80a9ce67", members:526, since:"1957年", host:"三浦 健（第35期）", you:"none", requests:[] },
+  { id:"cm-5", school:"千葉商科大学付属高等学校", club:"バスケットボール部", pref:"千葉県", type:"🏀",
+    photoId:"1546519638-68e109498ffc", members:154, since:"1981年", host:"岡田 真央（第29期）", you:"none", requests:[] },
+  { id:"cm-6", school:"県立千葉高等学校", club:"吹奏楽部", pref:"千葉県", type:"🎺",
+    photoId:"1415201364774-f6f0bb35f28f", members:267, since:"1949年", host:"林 由香（第31期）", you:"none", requests:[] },
 ];
 
 /* ---------- 状態 ---------- */
@@ -249,12 +294,18 @@ const state={
   donations:clone(seedDonations),
   events:clone(seedEvents),
   schedule:clone(seedSchedule),
+  communities:clone(seedCommunities),
   liked:new Set(),
   watched:new Set(),
   openComments:new Set(),
   boardTab:"大会情報",
   draftCat:"活動報告",
   draftEmoji:"",
+  wishPriority:"中",
+  wishEmoji:"🏉",
+  discoverQuery:"",
+  showRegister:false,
+  regType:"🏉",
   modal:null,
 };
 const currentUser=()=>users[state.role];
@@ -318,12 +369,22 @@ const KIND_COLOR={
   "OB戦":"background:var(--yell100);color:var(--yell700)",
   "懇親会":"background:var(--violet100);color:var(--violet700)",
 };
-const NOTICE_ICON={support:"🎁",comment:"💬",event:"💞",schedule:"📅",system:"🔔"};
+const NOTICE_ICON={support:"🎁",comment:"💬",event:"💞",schedule:"📅",system:"🔔",member:"🙋"};
 
 /* ---------- 共通パーツ ---------- */
 function avatar(emoji,role,size){const ring=role==="ob"?"ring-ob":role==="active"?"ring-active":"";return `<div class="avatar av-${size||"md"} ${ring}">${emoji}</div>`;}
 function progress(v,max,onDark){const pct=max===0?0:Math.min(100,Math.round((v/max)*100));return `<div class="progress ${onDark?"ondark":""}"><i style="width:${pct}%"></i></div>`;}
-function media(emoji,bg,height){return `<div class="media" style="background:${grad(bg)};height:${height||120}px"><span class="em">${emoji}</span><span class="ph">PHOTO</span></div>`;}
+function media(emoji,bg,height){return `<div class="media" style="background:${grad(bg)};height:${height||120}px"><span class="em">${emoji}</span></div>`;}
+/* 実写真：idがあればUnsplash画像を表示し、失敗時は背後の絵文字＋グラデにフォールバック */
+const UNSPLASH="https://images.unsplash.com/photo-";
+const uimg=(id,w)=>UNSPLASH+id+"?auto=format&fit=crop&w="+(w||800)+"&q=70";
+function photo(id,emoji,bg,height,radius){
+  const h=height||140, r=(radius==null?14:radius);
+  const box=`background:${grad(bg)};height:${h}px;border-radius:${r}px`;
+  if(!id) return `<div class="media" style="${box}"><span class="em">${emoji||"📷"}</span></div>`;
+  return `<div class="media" style="${box}"><span class="em">${emoji||"📷"}</span><img class="cover" src="${uimg(id)}" loading="lazy" alt="" onerror="this.remove()"></div>`;
+}
+function herobg(id){return id?`<img class="herobg" src="${uimg(id,1000)}" loading="lazy" alt="" onerror="this.remove()">`:"";}
 function secHead(title,em,action){return `<div class="sec-head"><h2 class="sec-title">${em?em+" ":""}${title}</h2>${action||""}</div>`;}
 
 /* ---------- 投稿カード ---------- */
@@ -350,7 +411,7 @@ function postCard(p){
       <span class="chip" style="${CAT_COLOR[p.category]}">${p.category}</span>
     </div>
     <div style="font-size:13px;line-height:1.7;margin:10px 0">${esc(p.body)}</div>
-    ${p.imageEmoji?media(p.imageEmoji,p.imageBg,140):""}
+    ${(p.imageId||p.imageEmoji)?photo(p.imageId,p.imageEmoji,p.imageBg,170):""}
     <div class="row between" style="margin-top:12px">
       <button class="pill" data-action="like" data-id="${p.id}" style="padding:6px 12px;${liked?"background:var(--ember100);color:var(--ember600)":""}">
         ${liked?"❤️":"🤍"} <span style="margin-left:4px">${p.likeCount}</span>
@@ -393,7 +454,7 @@ function wishCard(w){
   const prColor=w.priority==="高"?"background:var(--ember100);color:var(--ember600)":w.priority==="中"?"background:var(--yell100);color:var(--yell700)":"background:#e5e7eb;color:#6b7280";
   return `<div class="card">
     <div class="row" style="gap:12px;align-items:flex-start">
-      <div style="width:64px;flex:none">${media(w.emoji,w.bg,64)}</div>
+      <div style="width:64px;flex:none">${photo(w.imageId,w.emoji,w.bg,64,12)}</div>
       <div class="grow">
         <div class="row between" style="align-items:flex-start">
           <b style="font-size:13px;line-height:1.4">${esc(w.name)}</b>
@@ -431,9 +492,114 @@ function donationCard(){
 
 /* ---------- コミュニティ サブナビ ---------- */
 function communityNav(){
-  const items=[["community","👥 同期"],["board","💬 掲示板"],["events","💞 イベント"]];
-  return `<div class="row" style="gap:6px;background:#fff;border-radius:999px;padding:4px;box-shadow:var(--shadow)">
-    ${items.map(([r,l])=>`<div data-action="nav" data-route="${r}" style="flex:1;text-align:center;padding:8px 0;border-radius:999px;font-size:12px;font-weight:800;cursor:pointer;${state.route===r?"background:var(--grad);color:#fff":"color:var(--mut)"}">${l}</div>`).join("")}
+  const items=[["community","👥 同期"],["board","💬 掲示板"],["events","💞 イベント"],["discover","🔎 探す"]];
+  return `<div class="row" style="gap:4px;background:#fff;border-radius:999px;padding:4px;box-shadow:var(--shadow)">
+    ${items.map(([r,l])=>`<div data-action="nav" data-route="${r}" style="flex:1;text-align:center;padding:8px 0;border-radius:999px;font-size:11.5px;font-weight:800;cursor:pointer;${state.route===r?"background:var(--grad);color:#fff":"color:var(--mut)"}">${l}</div>`).join("")}
+  </div>`;
+}
+function discoverCta(){return `<div class="card" data-action="nav" data-route="discover" style="cursor:pointer"><div class="row between"><div class="row" style="gap:10px"><span style="font-size:20px">🔎</span><div><div class="small" style="font-weight:800">学校・部活コミュニティを探す</div><div class="xs muted">全国の部活を検索して参加申請・新規登録</div></div></div><span class="muted">›</span></div></div>`;}
+
+/* ---------- 物品を追加（現役生） ---------- */
+function addWishForm(){
+  const prios=["高","中","低"];
+  const emojis=["🏉","🛡️","🥤","👕","🧊","🎯","👟","🩹","⚽","🎽"];
+  return `<div class="card">
+    <div class="row" style="gap:6px"><b style="font-size:14px">🛍️ 欲しい物を追加する</b></div>
+    <div class="xs muted" style="margin:4px 0 12px">必要な物品を登録すると、OB/OGに支援を募集できます。</div>
+    <input type="text" id="wn" placeholder="品名（例：スクラムマシン）" />
+    <input type="text" id="wreason" placeholder="必要な理由を一言（例：接点強化のため）" style="margin-top:8px" />
+    <div class="row" style="gap:8px;margin-top:8px">
+      <input type="number" id="wprice" placeholder="単価（円）" min="100" step="100" />
+      <input type="number" id="wneeded" placeholder="必要数" min="1" step="1" />
+    </div>
+    <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center"><span class="xs muted">優先度:</span>
+      ${prios.map(p=>`<button class="cat-pill ${state.wishPriority===p?"sel":""}" data-action="pickWishP" data-p="${p}">${p}</button>`).join("")}
+    </div>
+    <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center"><span class="xs muted">アイコン:</span>
+      ${emojis.map(e=>`<button class="emoji-pill ${state.wishEmoji===e?"sel":""}" data-action="pickWishE" data-emoji="${e}">${e}</button>`).join("")}
+    </div>
+    <button class="btn btn-grad btn-block" data-action="addWish" style="margin-top:12px">＋ リストに追加する</button>
+  </div>`;
+}
+
+/* ---------- 探す（学校・部活の検索／登録／申請／承認） ---------- */
+function registerBlock(){
+  if(!state.showRegister){
+    return `<button class="btn btn-grad btn-block" data-action="toggleRegister">＋ 新しい学校・部活を登録する</button>`;
+  }
+  const types=["🏉","⚽","⚾","🏀","🎾","🏐","🎺","🥋","🏊","🎭"];
+  return `<div class="card">
+    <div class="row between" style="margin-bottom:4px"><b style="font-size:14px">＋ 新しい学校・部活を登録</b><button class="iconbtn" data-action="toggleRegister">✕</button></div>
+    <div class="note" style="margin:6px 0 12px">🏅 最初に登録した人が <b>ホスト（管理者）</b> になります。以降の参加申請を承認できます。</div>
+    <input type="text" id="rgschool" placeholder="学校名（例：県立〇〇高等学校）" />
+    <input type="text" id="rgclub" placeholder="部活動名（例：バレーボール部）" style="margin-top:8px" />
+    <input type="text" id="rgpref" placeholder="都道府県（例：千葉県）" style="margin-top:8px" />
+    <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center"><span class="xs muted">種別:</span>
+      ${types.map(t=>`<button class="emoji-pill ${state.regType===t?"sel":""}" data-action="regType" data-emoji="${t}">${t}</button>`).join("")}
+    </div>
+    <button class="btn btn-grad btn-block" data-action="registerCommunity" style="margin-top:12px">この内容でホスト登録する</button>
+  </div>`;
+}
+function communityCard(c){
+  const sm={
+    none:{badge:`<span class="statebadge" style="background:var(--warmbg);color:var(--mut)">未参加</span>`,
+      btn:`<button class="btn btn-grad btn-block" data-action="applyJoin" data-id="${c.id}" style="margin-top:12px">✋ 参加を申請する</button>`},
+    pending:{badge:`<span class="statebadge" style="background:var(--yell100);color:var(--yell700)">申請中</span>`,
+      btn:`<button class="btn btn-block" data-action="cancelApply" data-id="${c.id}" style="margin-top:12px;background:#f3f4f6;color:var(--ink2)">⏳ 承認待ち（タップで取消）</button>`},
+    member:{badge:`<span class="statebadge" style="background:var(--emerald100);color:var(--emerald700)">参加中</span>`,
+      btn:`<div class="small" style="text-align:center;color:var(--emerald600);font-weight:700;background:var(--emerald100);border-radius:999px;padding:9px;margin-top:12px">✓ このコミュニティに参加中</div>`},
+    host:{badge:`<span class="statebadge" style="background:var(--grad);color:#fff">🏅 ホスト</span>`,btn:""},
+  };
+  const s=sm[c.you]||sm.none;
+  let hostPanel="";
+  if(c.you==="host"){
+    const reqs=c.requests||[];
+    hostPanel=`<div style="margin-top:12px;border-top:1px dashed var(--border);padding-top:12px">
+      <div class="row between" style="margin-bottom:6px"><b class="small">🙋 参加申請の承認</b><span class="statebadge" style="${reqs.length?"background:var(--ember100);color:var(--ember600)":"background:var(--warmbg);color:var(--mut)"}">承認待ち ${reqs.length}件</span></div>
+      ${reqs.length?reqs.map((r,i)=>`<div class="req" style="margin-top:6px">
+          ${avatar(r.role==="ob"?"🧑‍💼":"🧑‍🎓",r.role,"sm")}
+          <div class="grow"><div class="row" style="gap:5px"><b style="font-size:12px">${esc(r.name)}</b><span class="rbadge ${r.role}">${r.role==="ob"?"OB/OG":"現役生"}</span></div><div class="xs muted">${esc(r.meta||"")}</div></div>
+          <button class="btn btn-grad" data-action="approveReq" data-id="${c.id}" data-idx="${i}" style="padding:6px 11px;font-size:11px;flex:none">承認</button>
+          <button class="pill" data-action="rejectReq" data-id="${c.id}" data-idx="${i}" style="padding:6px 9px;font-size:11px;flex:none">却下</button>
+        </div>`).join(""):`<div class="xs muted" style="text-align:center;padding:8px">承認待ちの申請はありません。</div>`}
+    </div>`;
+  }
+  return `<div class="cm">
+    <div class="banner">${c.photoId?`<img class="cover" src="${uimg(c.photoId)}" loading="lazy" alt="" onerror="this.remove()">`:""}<div class="ov"></div>
+      <div class="typ">${c.type}</div>
+      <div class="nm"><div class="xs" style="opacity:.95">${esc(c.pref)}・創部${esc(c.since)}</div><div style="font-weight:800;font-size:14px;line-height:1.3">${esc(c.school)}</div><div class="small" style="font-weight:700">${esc(c.club)}</div></div>
+    </div>
+    <div style="padding:14px">
+      <div class="row between">
+        <div class="grow"><div class="small muted">👥 メンバー ${c.members}名</div><div class="xs muted truncate">ホスト：${esc(c.host)}</div></div>
+        ${s.badge}
+      </div>
+      ${s.btn}
+      ${hostPanel}
+    </div>
+  </div>`;
+}
+function discoverResults(){
+  const q=state.discoverQuery.trim().toLowerCase();
+  const list=state.communities.filter(c=>!q||(c.school+c.club+c.pref).toLowerCase().includes(q));
+  if(!list.length) return `<div class="card" style="text-align:center;padding:28px 14px">
+    <div style="font-size:30px">🔎</div>
+    <div style="font-size:13px;font-weight:800;margin-top:8px">「${esc(state.discoverQuery)}」は見つかりませんでした</div>
+    <div class="xs muted" style="margin-top:6px;line-height:1.6">まだ登録されていないようです。<br>あなたが初代ホストとして登録してみませんか？</div>
+    <button class="btn btn-grad" data-action="toggleRegister" style="margin-top:12px;padding:9px 18px;font-size:12px">＋ 新しく登録する</button></div>`;
+  return list.map(communityCard).join("");
+}
+function discoverScreen(){
+  return `<div class="page stack gap4">
+    <h1 class="h1">🔎 学校・部活を探す</h1>
+    ${communityNav()}
+    <div class="hero grad">${herobg("1592066575517-58df903152f2")}
+      <div style="font-size:14px;font-weight:800">全国の高校・部活とつながる</div>
+      <div class="small" style="opacity:.92;margin-top:6px;line-height:1.6">学校名・部活名で検索して参加を申請。見つからなければ、あなたが初代ホストとして新規登録できます。</div>
+    </div>
+    <div class="search"><span>🔎</span><input type="text" data-action="discoverSearch" value="${esc(state.discoverQuery)}" placeholder="学校名・部活名で検索（例：千葉東 / サッカー）" /></div>
+    ${registerBlock()}
+    <div id="discover-results" class="stack gap3">${discoverResults()}</div>
   </div>`;
 }
 
@@ -442,6 +608,7 @@ function communityNav(){
    ============================================================ */
 function clubHero(){
   return `<div class="hero grad">
+    ${herobg("1574602904329-56e2f95fb15e")}
     <div class="row" style="gap:12px">
       <div style="width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:30px;backdrop-filter:blur(4px)">${club.emblem}</div>
       <div class="grow">
@@ -476,6 +643,7 @@ function homeActive(){
   return `<div class="page stack gap4">
     ${clubHero()}
     <div class="row" style="gap:12px">${quickLink("feed","📰","活動を投稿","練習・試合をシェア")}${quickLink("support","🎁","欲しい物リスト","支援を募集する")}</div>
+    ${discoverCta()}
     ${nextEventCard()}
     <div class="card" data-action="nav" data-route="support" style="cursor:pointer">
       <div class="row between"><b style="font-size:14px">🤝 欲しい物の充足状況</b><span class="small" style="font-weight:800;color:var(--ember600)">${tf}/${tn}個</span></div>
@@ -507,6 +675,7 @@ function homeOb(){
     </div>`:""}
     ${nextEventCard()}
     <div class="row" style="gap:12px">${quickLink("community","👥","コミュニティ","同期 "+alumniGroups.length+" 期が活動中")}${quickLink("board","💬","掲示板","OBの最新トピック")}</div>
+    ${discoverCta()}
     <div>${secHead("後輩たちの活動","❤️",`<span class="link" data-action="nav" data-route="feed">すべて見る ›</span>`)}
       <div class="stack gap4">${state.posts.slice(0,2).map(postCard).join("")}</div></div>
   </div>`;
@@ -554,11 +723,12 @@ function scheduleScreen(){
 function supportScreen(){
   return `<div class="page stack gap5">
     <div class="hero grad">
+      ${herobg("1522778119026-d647f0596c20")}
       <div class="row" style="gap:8px"><span style="font-size:22px">🤝</span><h1 class="h1">サポート</h1></div>
       <div class="xs" style="opacity:.9;margin-top:4px">${club.schoolName} ${club.clubName}</div>
       <div class="small" style="opacity:.85;margin-top:8px;line-height:1.6">${state.role==="ob"?"欲しい物リストから物品を、または金額で、ワンタップで応援できます。":"現在、部活が必要としている物品の一覧です。OB/OGの皆さんに支援をお願いしています。"}</div>
     </div>
-    ${state.role==="ob"?donationCard():""}
+    ${state.role==="ob"?donationCard():addWishForm()}
     <div>${secHead("欲しい物リスト","🛍️")}<div class="stack gap3">${state.wishlist.map(wishCard).join("")}</div></div>
     <div class="note">ℹ️ 支援した物品はメーカー・店舗から学校へ直送されます。手数料10%が運営費に充てられ、残りはすべて部活動の支援に使われます。</div>
   </div>`;
@@ -581,7 +751,7 @@ function communityScreen(){
   return `<div class="page stack gap4">
     <h1 class="h1">👥 OB/OGコミュニティ</h1>
     ${communityNav()}
-    <div class="hero grad"><div style="font-size:14px;font-weight:800">✨ 同期でつながる</div><div class="small" style="opacity:.92;margin-top:6px;line-height:1.6">卒業年度ごとの「同期グループ」。懐かしい仲間と再会し、世代を超えて後輩を応援しよう。</div></div>
+    <div class="hero grad">${herobg("1516600164266-f3b8166ae679")}<div style="font-size:14px;font-weight:800">✨ 同期でつながる</div><div class="small" style="opacity:.92;margin-top:6px;line-height:1.6">卒業年度ごとの「同期グループ」。懐かしい仲間と再会し、世代を超えて後輩を応援しよう。</div></div>
     <div class="stack gap3">${sorted.map(gCard).join("")}</div>
   </div>`;
 }
@@ -737,7 +907,7 @@ function renderBottom(){
     {r:"home",ic:"🏠",lb:"ホーム",on:()=>state.route==="home"},
     {r:"feed",ic:"📰",lb:"活動",on:()=>state.route==="feed"||state.route==="schedule"},
     {r:"support",ic:"🤝",lb:"サポート",on:()=>state.route==="support"},
-    {r:"community",ic:"👥",lb:"コミュニティ",on:()=>["community","board","events"].includes(state.route)},
+    {r:"community",ic:"👥",lb:"コミュニティ",on:()=>["community","board","events","discover"].includes(state.route)},
     {r:"mypage",ic:"👤",lb:"マイページ",on:()=>state.route==="mypage"},
   ];
   document.getElementById("bottomnav").outerHTML=`<nav class="bottomnav" id="bottomnav">${tabs.map(t=>`<a class="${t.on()?"on":""}" data-action="nav" data-route="${t.r}"><span class="ic">${t.ic}</span><span class="lb">${t.lb}</span></a>`).join("")}</nav>`;
@@ -761,7 +931,7 @@ function renderModal(){
     </div>
   </div>`;
 }
-const SCREENS={home:()=>state.role==="ob"?homeOb():homeActive(),feed:feedScreen,schedule:scheduleScreen,support:supportScreen,community:communityScreen,board:boardScreen,events:eventsScreen,mypage:mypageScreen,notifications:notificationsScreen};
+const SCREENS={home:()=>state.role==="ob"?homeOb():homeActive(),feed:feedScreen,schedule:scheduleScreen,support:supportScreen,community:communityScreen,board:boardScreen,events:eventsScreen,discover:discoverScreen,mypage:mypageScreen,notifications:notificationsScreen};
 function render(){
   renderTop(); renderBottom();
   document.getElementById("main").innerHTML=(SCREENS[state.route]||SCREENS.home)();
@@ -770,6 +940,18 @@ function render(){
 
 /* ---------- イベント ---------- */
 function go(route){state.route=route;document.getElementById("main").scrollTop=0;render();window.scrollTo(0,0);}
+
+/* 軽量トースト通知（モーダルを使わない確定フィードバック） */
+let toastTimer=null;
+function toast(msg){
+  const f=document.querySelector(".frame");
+  let t=document.getElementById("toast");
+  if(!t){t=document.createElement("div");t.id="toast";t.className="toast";f.appendChild(t);}
+  t.textContent=msg;
+  t.style.animation="none"; void t.offsetWidth; t.style.animation="toastin .25s ease";
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{const el=document.getElementById("toast");if(el)el.remove();},2800);
+}
 
 document.addEventListener("click",(e)=>{
   const el=e.target.closest("[data-action]");
@@ -846,12 +1028,69 @@ document.addEventListener("click",(e)=>{
       ev.joined=!ev.joined; ev.participants+=ev.joined?1:-1; render(); break;
     }
     case "boardTab":{ state.boardTab=el.dataset.board; render(); break; }
+    case "pickWishP":{ state.wishPriority=el.dataset.p;
+      document.querySelectorAll('[data-action="pickWishP"]').forEach(x=>x.classList.toggle("sel",x.dataset.p===state.wishPriority)); break; }
+    case "pickWishE":{ state.wishEmoji=el.dataset.emoji;
+      document.querySelectorAll('[data-action="pickWishE"]').forEach(x=>x.classList.toggle("sel",x.dataset.emoji===state.wishEmoji)); break; }
+    case "addWish":{
+      const nm=(((document.getElementById("wn")||{}).value)||"").trim();
+      const reason=(((document.getElementById("wreason")||{}).value)||"").trim();
+      const price=Math.floor(Number((document.getElementById("wprice")||{}).value));
+      const needed=Math.floor(Number((document.getElementById("wneeded")||{}).value));
+      if(!nm){ toast("品名を入力してください。"); break; }
+      if(!price||price<1){ toast("単価（円）を入力してください。"); break; }
+      if(!needed||needed<1){ toast("必要数を入力してください。"); break; }
+      const bgs=["orange","yell","pink","sky","cyan","violet"];
+      state.wishlist.unshift({id:newId("wish"),name:nm,emoji:state.wishEmoji,bg:bgs[state.wishlist.length%bgs.length],imageId:"",price,needed,funded:0,priority:state.wishPriority,reason:reason||"支援をお願いします。"});
+      render(); toast("「"+nm+"」を欲しい物リストに追加しました！"); break;
+    }
+    case "toggleRegister":{ state.showRegister=!state.showRegister; render(); break; }
+    case "regType":{ state.regType=el.dataset.emoji;
+      document.querySelectorAll('[data-action="regType"]').forEach(x=>x.classList.toggle("sel",x.dataset.emoji===state.regType)); break; }
+    case "registerCommunity":{
+      const school=(((document.getElementById("rgschool")||{}).value)||"").trim();
+      const cb=(((document.getElementById("rgclub")||{}).value)||"").trim();
+      const pref=(((document.getElementById("rgpref")||{}).value)||"").trim()||"未設定";
+      if(!school){ toast("学校名を入力してください。"); break; }
+      if(!cb){ toast("部活動名を入力してください。"); break; }
+      state.communities.unshift({id:newId("cm"),school,club:cb,pref,type:state.regType,photoId:"",members:1,since:new Date().getFullYear()+"年",host:currentUser().name+"（あなた）",you:"host",requests:[]});
+      state.showRegister=false; state.discoverQuery=""; render();
+      toast("「"+school+" "+cb+"」をホストとして登録しました🏅"); break;
+    }
+    case "applyJoin":{
+      const c=state.communities.find(x=>x.id===el.dataset.id); if(!c)break;
+      c.you="pending"; render(); toast("参加申請を送信しました。ホストの承認をお待ちください。"); break;
+    }
+    case "cancelApply":{
+      const c=state.communities.find(x=>x.id===el.dataset.id); if(!c)break;
+      c.you="none"; render(); toast("参加申請を取り消しました。"); break;
+    }
+    case "approveReq":{
+      const c=state.communities.find(x=>x.id===el.dataset.id); if(!c)break;
+      const r=(c.requests||[]).splice(Number(el.dataset.idx),1)[0]; if(r)c.members++;
+      render(); toast((r?r.name:"申請者")+" さんの参加を承認しました🎉"); break;
+    }
+    case "rejectReq":{
+      const c=state.communities.find(x=>x.id===el.dataset.id); if(!c)break;
+      const r=(c.requests||[]).splice(Number(el.dataset.idx),1)[0];
+      render(); toast((r?r.name:"申請")+" さんの申請を却下しました。"); break;
+    }
     case "closeModal":{
       // 背景（overlay）クリックは、背景自身をクリックした時のみ閉じる（シート内クリックでは閉じない）
       if(el.classList.contains("overlay") && e.target!==el) break;
       state.modal=null; render(); break;
     }
     case "demo": break;
+  }
+});
+
+/* 検索の入力（画面全体を再描画せず結果のみ更新＝フォーカス維持） */
+document.addEventListener("input",(e)=>{
+  const el=e.target.closest("[data-action]"); if(!el)return;
+  if(el.dataset.action==="discoverSearch"){
+    state.discoverQuery=el.value;
+    const box=document.getElementById("discover-results");
+    if(box) box.innerHTML=discoverResults();
   }
 });
 
