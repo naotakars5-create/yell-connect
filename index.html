@@ -90,7 +90,11 @@
   .iconbtn:hover{background:#e6eaf2;}
   .grad{background:var(--grad);color:#fff;}
   .gradsoft{background:var(--gradsoft);}
-  .avatar{flex:none;border-radius:999px;background:var(--warmbg);border:1px solid var(--border);display:grid;place-items:center;user-select:none;}
+  .avatar{flex:none;border-radius:999px;background:var(--warmbg);border:1px solid var(--border);display:grid;place-items:center;user-select:none;position:relative;overflow:hidden;}
+  .avatar .face{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;}
+  .photo-tile{position:relative;overflow:hidden;background:var(--warmbg);}
+  .photo-tile .face{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;}
+  .photo-tile>span{position:relative;z-index:0;}
   .av-sm{width:34px;height:34px;font-size:16px;} .av-md{width:42px;height:42px;font-size:21px;} .av-lg{width:56px;height:56px;font-size:26px;}
   .ring-ob{box-shadow:0 0 0 2px var(--yell400);} .ring-active{box-shadow:0 0 0 2px var(--emerald500);}
   .rbadge{font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;}
@@ -251,8 +255,8 @@ const seedWishlist = [
   { id:"wish-2", name:"タックルバッグ", emoji:"🛡️", bg:"yell", imageId:"1534583000938-a375b825ea16", price:12000, needed:4, funded:1, priority:"高", reason:"接点強化の要。中身が破れ、買い替えが必要です。" },
   { id:"wish-3", name:"プロテイン（部全体用）", emoji:"🥤", bg:"pink", imageId:"1593095948071-474c5cc2989d", price:4500, needed:12, funded:8, priority:"中", reason:"体づくりのため。消耗品なので継続的に必要です。" },
   { id:"wish-4", name:"練習用ユニフォーム", emoji:"👕", bg:"sky", imageId:"1577212017184-80cc0da11082", price:5200, needed:28, funded:12, priority:"中", reason:"新入部員ぶんが不足。揃いのウェアでチーム力を高めたい。" },
-  { id:"wish-5", name:"アイシング用クーラーボックス", emoji:"🧊", bg:"cyan", price:8900, needed:2, funded:0, priority:"低", reason:"夏場の熱中症・怪我対策に必要です。" },
-  { id:"wish-6", name:"キッキングティー", emoji:"🎯", bg:"violet", price:3200, needed:6, funded:6, priority:"低", reason:"プレースキック練習用。おかげさまで充足しました！" },
+  { id:"wish-5", name:"アイシング用クーラーボックス", emoji:"🧊", bg:"cyan", imageId:"1571902943202-507ec2618e8f", price:8900, needed:2, funded:0, priority:"低", reason:"夏場の熱中症・怪我対策に必要です。" },
+  { id:"wish-6", name:"キッキングティー", emoji:"🎯", bg:"violet", imageId:"1517466787929-bc90951d0974", price:3200, needed:6, funded:6, priority:"低", reason:"プレースキック練習用。おかげさまで充足しました！" },
 ];
 const seedSchedule = [
   { id:"sch-1", date:"2026-06-28T13:00:00+09:00", type:"試合", title:"県予選 3回戦 vs 流通経済大柏", place:"千葉県総合スポーツセンター", watchers:18 },
@@ -296,6 +300,7 @@ const notices = [
   { id:"no-4", icon:"schedule", title:"次の試合が近づいています", body:"6/28（日）13:00 県予選3回戦 vs 流通経済大柏。観戦予定はお済みですか？", createdAt:"2026-06-18T10:00:00+09:00", unread:false, audience:"all" },
   { id:"no-5", icon:"system", title:"年間支援ランクが更新されました", body:"今年の支援額が30,000円を超え、シルバーランクになりました🥈", createdAt:"2026-06-10T12:35:00+09:00", unread:false, audience:"ob" },
   { id:"no-6", icon:"member", title:"参加申請が届いています", body:"あなたがホストの「千葉東 ラグビー部」に2件の参加申請が届いています。承認をお願いします。", createdAt:"2026-06-21T07:45:00+09:00", unread:true, audience:"ob" },
+  { id:"no-7", icon:"dues", title:"2026年度 年会費のお願い", body:"OB会 年会費（¥5,000）の納付期限は7月31日です。マイページから納付できます。", createdAt:"2026-06-22T09:00:00+09:00", unread:true, audience:"ob" },
 ];
 
 /* 学校×部活コミュニティ（検索・登録・申請・承認のデモ用） */
@@ -333,6 +338,24 @@ const SUPPORTERS_BASE=seedSupporters.reduce((s,x)=>s+x.amount,0); // 409,000
 const CLUB_GOAL=800000;          // 部の年間支援目標
 const GOAL_SUPPORTERS=42;        // のべ支援者数（表示用）
 
+/* OB/OG会費（年会費）の集金システム用データ */
+const DUES = {
+  year:2026, fee:5000,            // 今年度の年会費
+  obTotal:412, paidCount:287,     // 全体の納付状況（自分が納付すると+1）
+  deadline:"2026-07-31",          // 納付期限
+  history:[                       // 自分の過去の納付履歴
+    { year:2025, amount:5000, date:"2025-05-12T10:00:00+09:00" },
+    { year:2024, amount:5000, date:"2024-06-03T10:00:00+09:00" },
+    { year:2023, amount:4000, date:"2023-05-20T10:00:00+09:00" },
+  ],
+  usage:[                         // 会費の使途内訳（%）
+    { label:"用具・備品の更新",       pct:38, emoji:"🏉" },
+    { label:"大会・遠征費の補助",     pct:27, emoji:"🚌" },
+    { label:"グラウンド・施設の整備", pct:20, emoji:"🌱" },
+    { label:"同窓会・OB会の運営",     pct:15, emoji:"🎓" },
+  ],
+};
+
 /* 現役生→OBへの「感謝の声」 */
 const seedThanks = [
   { name:"佐藤 蓮", avatar:"🧑‍🎓", role:"副キャプテン", body:"新しいボールでパスが安定しました！県予選、絶対に勝ち抜きます。本当にありがとうございます🙏" },
@@ -358,6 +381,7 @@ const state={
   watched:new Set(),
   openComments:new Set(),
   commentLiked:new Set(),
+  duesPaid:false,
   feedFilter:"すべて",
   boardTab:"大会情報",
   draftCat:"活動報告",
@@ -373,6 +397,9 @@ const currentUser=()=>users[state.role];
 const yearlyTotal=()=>state.donations.reduce((s,d)=>s+d.amount,0);
 /* 部全体の今年の支援総額（他OB合計＋自分の今年の支援、支援するたびに増える） */
 const communityRaised=()=>SUPPORTERS_BASE+yearlyTotal();
+/* 会費：自分が納付すると納付者数・集金総額が増える */
+const duesPaidCount=()=>DUES.paidCount+(state.duesPaid?1:0);
+const duesCollected=()=>duesPaidCount()*DUES.fee;
 /* ランキング：自分（現OBユーザー）を動的に挿入して降順ソート */
 function leaderboard(){
   const me={name:users.ob.name,avatar:users.ob.avatar,year:users.ob.graduationYear,amount:yearlyTotal(),me:true};
@@ -437,10 +464,22 @@ const KIND_COLOR={
   "OB戦":"background:var(--yell100);color:var(--yell700)",
   "懇親会":"background:var(--violet100);color:var(--violet700)",
 };
-const NOTICE_ICON={support:"🎁",comment:"💬",event:"💞",schedule:"📅",system:"🔔",member:"🙋"};
+const NOTICE_ICON={support:"🎁",comment:"💬",event:"💞",schedule:"📅",system:"🔔",member:"🙋",dues:"🧾"};
 
 /* ---------- 共通パーツ ---------- */
-function avatar(emoji,role,size){const ring=role==="ob"?"ring-ob":role==="active"?"ring-active":"";return `<div class="avatar av-${size||"md"} ${ring}">${emoji}</div>`;}
+/* 人物の顔写真：名前をシードに決定論的な実写ポートレートを割り当て（失敗時は絵文字にフォールバック） */
+const FEMALE=/美咲|さやか|由香|真央|葵|凛|花|香|子|恵|奈|愛/;
+function face(seed){
+  let h=0; for(let i=0;i<seed.length;i++){h=(h*31+seed.charCodeAt(i))>>>0;}
+  const g=FEMALE.test(seed)?"women":"men";
+  return `https://randomuser.me/api/portraits/${g}/${h%100}.jpg`;
+}
+/* seed（人名）を渡すと実写アバター、なければ絵文字アバター */
+function avatar(emoji,role,size,seed){
+  const ring=role==="ob"?"ring-ob":role==="active"?"ring-active":"";
+  const img=seed?`<img class="face" src="${face(seed)}" alt="" loading="lazy" onerror="this.remove()">`:"";
+  return `<div class="avatar av-${size||"md"} ${ring}">${emoji}${img}</div>`;
+}
 function progress(v,max,onDark){const pct=max===0?0:Math.min(100,Math.round((v/max)*100));return `<div class="progress ${onDark?"ondark":""}"><i style="width:${pct}%"></i></div>`;}
 function media(emoji,bg,height){return `<div class="media" style="background:${grad(bg)};height:${height||120}px"><span class="em">${emoji}</span></div>`;}
 /* 実写真：idがあればUnsplash画像を表示し、失敗時は背後の絵文字＋グラデにフォールバック */
@@ -464,7 +503,7 @@ function postCard(p){
     const cn=(c.likeCount||0)+(cl?1:0);
     return `
     <div class="row" style="gap:8px;align-items:flex-start;margin-top:10px">
-      ${avatar(c.authorAvatar,c.authorRole,"sm")}
+      ${avatar(c.authorAvatar,c.authorRole,"sm",c.authorName)}
       <div class="grow" style="background:var(--warmbg);border-radius:13px;padding:9px 11px">
         <div class="row between"><div class="row" style="gap:5px"><b style="font-size:12px">${esc(c.authorName)}</b><span class="rbadge ${c.authorRole}">${c.authorRole==="ob"?"OB/OG":"現役生"}</span></div>
           <button class="pill" data-action="likeComment" data-id="${c.id}" data-stop="1" style="padding:3px 9px;font-size:11px;${cl?"background:var(--ember100);color:var(--ember600);border-color:transparent":""}">${cl?"❤️":"🤍"}${cn?" "+cn:""}</button></div>
@@ -474,7 +513,7 @@ function postCard(p){
   return `<div class="card">
     <div class="row between">
       <div class="row" style="gap:8px">
-        ${avatar(p.authorAvatar,p.authorRole,"md")}
+        ${avatar(p.authorAvatar,p.authorRole,"md",p.authorName)}
         <div>
           <div class="row" style="gap:5px"><b style="font-size:13px">${esc(p.authorName)}</b><span class="rbadge ${p.authorRole}">${p.authorRole==="ob"?"OB/OG":"現役生"}</span></div>
           <div class="xs muted">${timeAgo(p.createdAt)}</div>
@@ -506,7 +545,7 @@ function newPostForm(){
   const cats=["練習","試合結果","活動報告","お知らせ"];
   const emojis=["🏉","💪","🔥","🌤️","🏆","📣","🍙","🤝"];
   return `<div class="card">
-    <div class="row" style="gap:8px;margin-bottom:10px">${avatar(currentUser().avatar,"active","sm")}<b style="font-size:13px">いまの活動をシェアしよう</b></div>
+    <div class="row" style="gap:8px;margin-bottom:10px">${avatar(currentUser().avatar,"active","sm",currentUser().name)}<b style="font-size:13px">いまの活動をシェアしよう</b></div>
     <textarea id="np-text" rows="3" placeholder="練習や試合のようすを書いてみよう…"></textarea>
     <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:10px">
       ${cats.map(c=>`<button class="cat-pill ${state.draftCat===c?"sel":""}" data-action="pickCat" data-cat="${c}">${c}</button>`).join("")}
@@ -629,7 +668,7 @@ function communityCard(c){
     hostPanel=`<div style="margin-top:12px;border-top:1px dashed var(--border);padding-top:12px">
       <div class="row between" style="margin-bottom:6px"><b class="small">🙋 参加申請の承認</b><span class="statebadge" style="${reqs.length?"background:var(--ember100);color:var(--ember600)":"background:var(--warmbg);color:var(--mut)"}">承認待ち ${reqs.length}件</span></div>
       ${reqs.length?reqs.map((r,i)=>`<div class="req" style="margin-top:6px">
-          ${avatar(r.role==="ob"?"🧑‍💼":"🧑‍🎓",r.role,"sm")}
+          ${avatar(r.role==="ob"?"🧑‍💼":"🧑‍🎓",r.role,"sm",r.name)}
           <div class="grow"><div class="row" style="gap:5px"><b style="font-size:12px">${esc(r.name)}</b><span class="rbadge ${r.role}">${r.role==="ob"?"OB/OG":"現役生"}</span></div><div class="xs muted">${esc(r.meta||"")}</div></div>
           <button class="btn btn-grad" data-action="approveReq" data-id="${c.id}" data-idx="${i}" style="padding:6px 11px;font-size:11px;flex:none">承認</button>
           <button class="pill" data-action="rejectReq" data-id="${c.id}" data-idx="${i}" style="padding:6px 9px;font-size:11px;flex:none">却下</button>
@@ -702,7 +741,7 @@ function goalThermo(compact){
 function thanksBlock(){
   return `<div>${secHead("現役からの感謝の声","💌")}
     <div class="stack gap2">${seedThanks.map(t=>`<div class="thanks">
-      ${avatar(t.avatar,"active","sm")}
+      ${avatar(t.avatar,"active","sm",t.name)}
       <div class="grow"><div class="row" style="gap:5px"><b style="font-size:12.5px;color:#065f46">${esc(t.name)}</b><span class="rbadge active">${esc(t.role)}</span></div>
         <div class="body" style="margin-top:4px">${esc(t.body)}</div></div>
     </div>`).join("")}</div></div>`;
@@ -713,10 +752,11 @@ function rankingScreen(){
   const list=leaderboard();
   const myRank=list.findIndex(x=>x.me)+1;
   const medal=(i)=>i===0?"🥇":i===1?"🥈":i===2?"🥉":"#"+(i+1);
-  const row=(x,i)=>`<div class="lbrow ${x.me?"me":""}">
+  const mine=(x)=>x.me&&state.role==="ob";
+  const row=(x,i)=>`<div class="lbrow ${mine(x)?"me":""}">
     <div class="lbrank ${i<3?"top":""}">${medal(i)}</div>
-    ${avatar(x.avatar,"ob","sm")}
-    <div class="grow"><div class="row" style="gap:6px"><b style="font-size:13px">${esc(x.name)}</b>${x.me?`<span class="chip" style="background:var(--yell100);color:var(--yell700)">あなた</span>`:""}</div><div class="xs muted">${x.year}年卒</div></div>
+    ${avatar(x.avatar,"ob","sm",x.name)}
+    <div class="grow"><div class="row" style="gap:6px"><b style="font-size:13px">${esc(x.name)}</b>${mine(x)?`<span class="chip" style="background:var(--yell100);color:var(--yell700)">あなた</span>`:""}</div><div class="xs muted">${x.year}年卒</div></div>
     <div style="text-align:right;flex:none"><div style="font-weight:900;font-size:14px">${yen(x.amount)}</div><div class="xs muted">今年</div></div>
   </div>`;
   return `<div class="page stack gap4">
@@ -724,12 +764,66 @@ function rankingScreen(){
     ${communityNav()}
     ${goalThermo(false)}
     <div class="hero grad">${herobg("1461896836934-ffe607ba8211")}
-      <div style="font-size:14.5px;font-weight:900">あなたは現在 ${myRank} 位 🎉</div>
-      <div class="small" style="opacity:.92;margin-top:6px;line-height:1.6">今年の支援額ランキング。続けて応援すると、ランクと順位が上がります。後輩たちへの想いを、かたちに。</div>
+      <div style="font-size:14.5px;font-weight:900">${state.role==="ob"?`あなたは現在 ${myRank} 位 🎉`:"OB/OGの支援額ランキング 🏆"}</div>
+      <div class="small" style="opacity:.92;margin-top:6px;line-height:1.6">${state.role==="ob"?"今年の支援額ランキング。続けて応援すると、ランクと順位が上がります。後輩たちへの想いを、かたちに。":"OB/OGの皆さんが今年届けてくれた応援です。たくさんの支援に支えられています。"}</div>
     </div>
     <div>${secHead("2026年 支援額ランキング","📊",`<span class="small muted">全${list.length}名</span>`)}
       <div class="stack gap2">${list.map(row).join("")}</div></div>
     <div class="note">ℹ️ 表示額・順位はデモ用のサンプルです。「OB/OG」表示時に支援すると、あなたの金額と順位がリアルタイムに更新されます。</div>
+  </div>`;
+}
+
+/* ---------- OB会 年会費（集金システム） ---------- */
+function duesCard(){
+  const paid=state.duesPaid;
+  return `<div class="card" data-action="nav" data-route="dues" style="cursor:pointer">
+    <div class="row between">
+      <div class="row" style="gap:10px"><span style="font-size:22px">🧾</span>
+        <div><div style="font-weight:900;font-size:14px">${DUES.year}年度 OB会 年会費</div><div class="xs muted">年額 ${yen(DUES.fee)}・期限 ${fmtD(DUES.deadline)}</div></div></div>
+      <span class="statebadge" style="${paid?"background:var(--emerald100);color:var(--emerald700)":"background:var(--ember100);color:var(--ember600)"}">${paid?"納付済み ✓":"未納"}</span>
+    </div>
+    ${paid?"":`<button class="btn btn-grad btn-block" data-action="payDues" data-stop="1" style="margin-top:12px">💳 ${yen(DUES.fee)} を納付する</button>`}
+  </div>`;
+}
+function duesScreen(){
+  const paid=state.duesPaid;
+  const rate=Math.min(100,Math.round((duesPaidCount()/DUES.obTotal)*100));
+  const hist=(paid?[{year:DUES.year,amount:DUES.fee,date:new Date().toISOString(),current:true}]:[]).concat(DUES.history);
+  const usageRow=(u)=>`<div>
+    <div class="row between" style="margin-bottom:5px"><span class="small" style="font-weight:700">${u.emoji} ${u.label}</span><span class="small" style="font-weight:800;color:var(--yell600)">${u.pct}%</span></div>
+    ${progress(u.pct,100)}
+  </div>`;
+  const histRow=(h)=>`<div class="card row" style="gap:12px;padding:12px;align-items:center">
+    <div style="width:40px;height:40px;border-radius:12px;background:var(--gradsoft);display:grid;place-items:center;font-size:19px;flex:none">🧾</div>
+    <div class="grow"><div class="small" style="font-weight:800">${h.year}年度 年会費</div><div class="xs muted">${fmtD(h.date)} 納付${h.current?" ・たった今":""}</div></div>
+    <div style="text-align:right;flex:none"><div style="font-weight:800;font-size:14px">${yen(h.amount)}</div><span class="chip" style="background:var(--emerald100);color:var(--emerald700)">済</span></div>
+  </div>`;
+  return `<div class="page stack gap5">
+    <div class="row" style="gap:8px"><button class="iconbtn" data-action="nav" data-route="mypage">←</button><h1 class="h1">OB会 年会費</h1></div>
+    <div class="hero grad">${herobg("1518091043644-c1d4457512c6")}
+      <div class="row" style="gap:9px"><span style="font-size:24px">🧾</span><div><div style="font-size:17px;font-weight:900;line-height:1.2">${DUES.year}年度 年会費</div><div class="xs" style="opacity:.9">${club.schoolName} ${club.clubName} OB会</div></div></div>
+      <div class="small" style="opacity:.92;margin-top:10px;line-height:1.6">会費は用具の更新や遠征費の補助など、後輩たちの活動環境づくりに使われます。ご協力をお願いします。</div>
+    </div>
+    <div class="card">
+      <div class="row between">
+        <div><div class="xs muted">${DUES.year}年度 年会費</div><div class="bignum" style="margin-top:2px">${yen(DUES.fee)}</div></div>
+        <span class="statebadge" style="${paid?"background:var(--emerald100);color:var(--emerald700)":"background:var(--ember100);color:var(--ember600)"}">${paid?"納付済み ✓":"未納"}</span>
+      </div>
+      ${paid
+        ? `<div class="thanks" style="margin-top:12px"><span style="font-size:18px">✅</span><div class="grow"><div style="font-weight:800;color:#065f46;font-size:12.5px">${DUES.year}年度の会費は納付済みです</div><div class="body" style="margin-top:2px">ご協力ありがとうございます。後輩たちへ届けます。</div></div></div>
+           <button class="btn btn-block" data-action="duesReceipt" style="margin-top:10px;background:#fff;color:var(--ink2);border:1px solid var(--border)">🧾 領収書を表示（デモ）</button>`
+        : `<button class="btn btn-grad btn-block" data-action="payDues" style="margin:12px 0 8px">💳 ${yen(DUES.fee)} を納付する</button>
+           <div class="xs muted" style="text-align:center">納付期限：${fmtD(DUES.deadline)} まで</div>`}
+    </div>
+    <div class="card thermo">
+      <div class="row between"><div class="row" style="gap:7px"><span style="font-size:18px">📊</span><b style="font-size:14.5px">OB会全体の納付状況</b></div><span class="chip" style="background:var(--ember100);color:var(--ember600)">納付率 ${rate}%</span></div>
+      <div class="row" style="gap:8px;align-items:baseline;margin:12px 0 10px"><span class="bignum" style="color:var(--ember600)">${yen(duesCollected())}</span><span class="small muted">集金済み</span></div>
+      <div class="barwrap"><i style="width:${rate}%"></i></div>
+      <div class="row between" style="margin-top:10px"><span class="xs muted">👥 ${duesPaidCount()} / ${DUES.obTotal} 名が納付</span><span class="xs" style="font-weight:800;color:var(--yell600)">未納 ${DUES.obTotal-duesPaidCount()} 名</span></div>
+    </div>
+    <div>${secHead("会費の使途","🧭")}<div class="card stack gap3">${DUES.usage.map(usageRow).join("")}</div></div>
+    <div>${secHead("あなたの納付履歴","🗂️",`<span class="small muted">${hist.length}年分</span>`)}<div class="stack gap2">${hist.length?hist.map(histRow).join(""):`<div class="card muted small" style="text-align:center;padding:24px 0">納付履歴はまだありません。</div>`}</div></div>
+    <div class="note">ℹ️ これはデモ用のダミー決済です。実際の請求は発生しません。納付状況・領収書はサンプル表示です。</div>
   </div>`;
 }
 
@@ -805,6 +899,7 @@ function homeOb(){
       <div style="display:inline-flex;gap:4px;align-items:center;background:rgba(255,255,255,.2);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:800;margin-top:10px;backdrop-filter:blur(4px)">🎁 欲しい物リストを見る ›</div>
     </div>`:""}
     ${goalThermo(true)}
+    ${duesCard()}
     ${nextEventCard()}
     <div class="row" style="gap:12px">${quickLink("ranking","🏆","支援ランキング","あなたの順位を見る")}${quickLink("board","💬","掲示板","OBの最新トピック")}</div>
     ${discoverCta()}
@@ -867,7 +962,7 @@ function supportScreen(){
     ${goalThermo(true)}
     ${state.role==="ob"?donationCard():addWishForm()}
     <div>${secHead("欲しい物リスト","🛍️")}<div class="stack gap3">${state.wishlist.map(wishCard).join("")}</div></div>
-    ${thanksBlock()}
+    ${state.role==="ob"?thanksBlock():""}
     <div class="note">ℹ️ 支援した物品はメーカー・店舗から学校へ直送されます。手数料10%が運営費に充てられ、残りはすべて部活動の支援に使われます。</div>
   </div>`;
 }
@@ -897,12 +992,12 @@ function communityScreen(){
 function boardScreen(){
   const tabs=["大会情報","活動報告","雑談"];
   const list=boardPosts.filter(p=>p.board===state.boardTab).sort((a,b)=>+new Date(b.createdAt)-+new Date(a.createdAt));
-  const thread=(p)=>`<div class="card">
+  const thread=(p)=>`<div class="card" data-action="openThread" style="cursor:pointer">
     <div class="row" style="gap:8px;margin-bottom:8px"><span class="chip" style="${BOARD_COLOR[p.board]}">${p.board}</span><span class="xs muted">${timeAgo(p.createdAt)}</span></div>
     <div style="font-weight:800;font-size:14px;line-height:1.4">${esc(p.title)}</div>
     <div class="small muted clamp2" style="margin-top:4px;line-height:1.6">${esc(p.body)}</div>
     <div class="row between" style="margin-top:12px">
-      <div class="row" style="gap:8px">${avatar(p.authorAvatar,null,"sm")}<div><div class="small" style="font-weight:800">${esc(p.authorName)}</div>${p.graduationYear?`<div class="xs muted">${p.graduationYear}年卒</div>`:""}</div></div>
+      <div class="row" style="gap:8px">${avatar(p.authorAvatar,p.graduationYear?"ob":null,"sm",p.authorName)}<div><div class="small" style="font-weight:800">${esc(p.authorName)}</div>${p.graduationYear?`<div class="xs muted">${p.graduationYear}年卒</div>`:""}</div></div>
       <span class="small muted">💬 ${p.replyCount}件の返信</span>
     </div>
   </div>`;
@@ -911,7 +1006,7 @@ function boardScreen(){
     ${communityNav()}
     <div class="tabs">${tabs.map(t=>`<button class="${state.boardTab===t?"on":""}" data-action="boardTab" data-board="${t}">${t}</button>`).join("")}</div>
     <div class="stack gap3">${list.length?list.map(thread).join(""):`<div class="muted small" style="text-align:center;padding:32px 0">まだ投稿がありません。</div>`}</div>
-    <button class="btn btn-grad btn-block" data-action="demo">＋ 新しいスレッドを立てる</button>
+    <button class="btn btn-grad btn-block" data-action="newThread">＋ 新しいスレッドを立てる</button>
   </div>`;
 }
 
@@ -977,7 +1072,7 @@ function mypageScreen(){
     return `<div class="page stack gap5">
       <div class="hero" style="background:${r.grad}">
         <div class="row" style="gap:12px">
-          <div style="width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.25);display:grid;place-items:center;font-size:28px;backdrop-filter:blur(4px)">${currentUser().avatar}</div>
+          <div class="photo-tile" style="width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.25);display:grid;place-items:center;font-size:28px;backdrop-filter:blur(4px)"><span>${currentUser().avatar}</span><img class="face" src="${face(currentUser().name)}" alt="" loading="lazy" onerror="this.remove()"></div>
           <div class="grow"><div style="font-size:18px;font-weight:800;line-height:1.2">${currentUser().name}</div><div class="xs" style="opacity:.9">${currentUser().position}</div></div>
           <div style="text-align:center"><div style="font-size:30px;line-height:1">${r.emoji}</div><div class="xs" style="font-weight:800;margin-top:2px">${r.label}</div></div>
         </div>
@@ -988,6 +1083,7 @@ function mypageScreen(){
       </div>
       <div class="row" style="gap:12px">${stat("📈",state.donations.length,"支援回数")}${stat("📦",itemCount,"物品支援")}${stat("🪙",moneyCount,"金額支援")}</div>
       <div>${secHead("支援ランク","🏅")}<div class="card stack gap2">${ranks.map(rankRow).join("")}</div></div>
+      <div>${secHead("OB会 年会費","🧾")}${duesCard()}</div>
       <div>${secHead("支援履歴","🎁",`<span class="small muted">${state.donations.length}件</span>`)}<div class="stack gap2">${state.donations.map(donRow).join("")}</div></div>
       <button class="btn btn-grad btn-block" data-action="nav" data-route="support">❤️ 続けて応援する</button>
     </div>`;
@@ -1000,7 +1096,7 @@ function mypageScreen(){
   return `<div class="page stack gap5">
     <div class="hero grad">
       <div class="row" style="gap:12px">
-        <div style="width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.25);display:grid;place-items:center;font-size:28px;backdrop-filter:blur(4px)">${currentUser().avatar}</div>
+        <div class="photo-tile" style="width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.25);display:grid;place-items:center;font-size:28px;backdrop-filter:blur(4px)"><span>${currentUser().avatar}</span><img class="face" src="${face(currentUser().name)}" alt="" loading="lazy" onerror="this.remove()"></div>
         <div class="grow"><div class="row" style="gap:6px"><div style="font-size:18px;font-weight:800;line-height:1.2">${currentUser().name}</div><span class="rbadge active">現役生</span></div><div class="xs" style="opacity:.9">${currentUser().grade}</div><div class="xs" style="opacity:.9">${currentUser().position}</div></div>
       </div>
       <div class="small" style="opacity:.92;margin-top:12px;line-height:1.6">${currentUser().bio}</div>
@@ -1016,12 +1112,18 @@ function mypageScreen(){
 
 function notificationsScreen(){
   const list=notices.filter(n=>n.audience==="all"||n.audience===state.role).sort((a,b)=>+new Date(b.createdAt)-+new Date(a.createdAt));
-  const row=(n)=>`<div class="card row" style="gap:12px;align-items:flex-start;${n.unread?"":"opacity:.7"}">
+  const ROUTE={support:"support",comment:"feed",event:"events",schedule:"schedule",member:"discover",dues:"dues"};
+  const row=(n)=>{const rt=ROUTE[n.icon];return `<div class="card row" style="gap:12px;align-items:flex-start;${n.unread?"":"opacity:.7"}${rt?";cursor:pointer":""}" ${rt?`data-action="nav" data-route="${rt}" data-nid="${n.id}"`:""}>
     <div style="width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:18px;flex:none;background:var(--warmbg)">${NOTICE_ICON[n.icon]}</div>
     <div class="grow"><div class="row" style="gap:6px"><b style="font-size:13px">${esc(n.title)}</b>${n.unread?`<span style="width:6px;height:6px;border-radius:999px;background:var(--ember500);flex:none"></span>`:""}</div><div class="small muted" style="margin-top:2px;line-height:1.6">${esc(n.body)}</div><div class="xs muted" style="margin-top:4px">${timeAgo(n.createdAt)}</div></div>
-  </div>`;
+    ${rt?`<span class="muted" style="align-self:center">›</span>`:""}
+  </div>`;};
+  const unread=list.filter(n=>n.unread).length;
   return `<div class="page stack gap4">
-    <div class="row" style="gap:8px"><button class="iconbtn" data-action="nav" data-route="home">←</button><h1 class="h1">お知らせ</h1></div>
+    <div class="row between">
+      <div class="row" style="gap:8px"><button class="iconbtn" data-action="nav" data-route="home">←</button><h1 class="h1">お知らせ</h1></div>
+      ${unread?`<span class="link" data-action="readAll">✓ すべて既読</span>`:`<span class="xs muted">すべて既読済み</span>`}
+    </div>
     <div class="stack gap2">${list.length?list.map(row).join(""):`<div class="muted small" style="text-align:center;padding:40px 0">お知らせはありません。</div>`}</div>
   </div>`;
 }
@@ -1057,7 +1159,7 @@ function renderModal(){
   root.innerHTML=`<div class="overlay" data-action="closeModal">
     <div class="sheet" data-stop="1">
       <div class="check">✓</div>
-      <div style="font-size:18px;font-weight:800">支援が完了しました！</div>
+      <div style="font-size:18px;font-weight:800">${m.title||"支援が完了しました！"}</div>
       <div class="small muted" style="margin-top:6px">${m.kind}</div>
       <div style="margin:16px 0;background:var(--gradsoft);border-radius:16px;padding:16px">
         <div style="font-size:36px">${m.emoji}</div>
@@ -1069,7 +1171,7 @@ function renderModal(){
     </div>
   </div>`;
 }
-const SCREENS={home:()=>state.role==="ob"?homeOb():homeActive(),feed:feedScreen,schedule:scheduleScreen,support:supportScreen,community:communityScreen,ranking:rankingScreen,board:boardScreen,events:eventsScreen,discover:discoverScreen,mypage:mypageScreen,notifications:notificationsScreen};
+const SCREENS={home:()=>state.role==="ob"?homeOb():homeActive(),feed:feedScreen,schedule:scheduleScreen,support:supportScreen,community:communityScreen,ranking:rankingScreen,board:boardScreen,events:eventsScreen,discover:discoverScreen,dues:duesScreen,mypage:mypageScreen,notifications:notificationsScreen};
 function render(){
   renderTop(); renderBottom();
   document.getElementById("main").innerHTML=(SCREENS[state.route]||SCREENS.home)();
@@ -1099,10 +1201,19 @@ document.addEventListener("click",(e)=>{
   if(el.dataset.stop) e.stopPropagation();
 
   switch(a){
-    case "nav": go(el.dataset.route); break;
+    case "nav":{
+      // お知らせからの遷移は、その通知を既読にする
+      if(el.dataset.nid){const n=notices.find(x=>x.id===el.dataset.nid);if(n)n.unread=false;}
+      go(el.dataset.route); break;
+    }
+    case "readAll":{
+      notices.forEach(n=>{if(n.audience==="all"||n.audience===state.role)n.unread=false;});
+      render(); toast("すべてのお知らせを既読にしました。"); break;
+    }
     case "setRole":{
       state.role=el.dataset.role; localStorage.setItem(ROLE_KEY,state.role);
-      // フォーム下書きはロール跨ぎでリセット
+      // 現役生にはOB専用画面（会費）を表示しない
+      if(state.role==="active" && state.route==="dues") state.route="home";
       render(); break;
     }
     case "like":{
@@ -1165,6 +1276,14 @@ document.addEventListener("click",(e)=>{
       const id=el.dataset.id; const ev=state.events.find(x=>x.id===id);
       ev.joined=!ev.joined; ev.participants+=ev.joined?1:-1; render(); break;
     }
+    case "payDues":{
+      e.stopPropagation();
+      if(state.duesPaid)break;
+      state.duesPaid=true;
+      state.modal={title:"会費の納付が完了しました！",label:DUES.year+"年度 OB会 年会費",emoji:"🧾",amount:DUES.fee,kind:"年会費の納付"};
+      render(); break;
+    }
+    case "duesReceipt":{ toast("領収書を発行しました（デモ）。登録メール宛に送信した想定です。"); break; }
     case "feedFilter":{ state.feedFilter=el.dataset.cat; render(); break; }
     case "likeComment":{
       e.stopPropagation();
@@ -1225,6 +1344,8 @@ document.addEventListener("click",(e)=>{
       if(el.classList.contains("overlay") && e.target!==el) break;
       state.modal=null; render(); break;
     }
+    case "openThread":{ toast("スレッドの詳細・返信はデモ版では準備中です。"); break; }
+    case "newThread":{ toast("スレッド作成はデモ版では準備中です。"); break; }
     case "demo": break;
   }
 });
